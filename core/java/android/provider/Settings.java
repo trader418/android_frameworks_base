@@ -2904,6 +2904,12 @@ public final class Settings {
         public static final String VOLUME_WAKE_SCREEN = "volume_wake_screen";
 
         /**
+         * Whether to change height of On screen Buttons.
+         * @hide
+         */
+        public static final String ON_SCREEN_BUTTONS_HEIGHT = "on_screen_buttons_height";
+
+        /**
          * Whether or not volume button music controls should be enabled to seek media tracks
          * @hide
          */
