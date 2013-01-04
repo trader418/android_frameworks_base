@@ -1369,9 +1369,13 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     Settings.System.VOLBTN_MUSIC_CONTROLS, 1, UserHandle.USER_CURRENT) == 1);
             int  mOnScreenButtonsHeight = (Settings.System.getInt(resolver,
                     Settings.System.ON_SCREEN_BUTTONS_HEIGHT, 32 * DisplayMetrics.DENSITY_DEVICE/DisplayMetrics.DENSITY_DEFAULT)); //32dp dafault value.
+            int  mOnScreenButtonsWidth = (Settings.System.getInt(resolver,
+                    Settings.System.ON_SCREEN_BUTTONS_WIDTH, 32 * DisplayMetrics.DENSITY_DEVICE/DisplayMetrics.DENSITY_DEFAULT)); //32dp dafault value.
 
             mNavigationBarHeightForRotation[mPortraitRotation] =
             mNavigationBarHeightForRotation[mUpsideDownRotation] = mOnScreenButtonsHeight * DisplayMetrics.DENSITY_DEVICE/DisplayMetrics.DENSITY_DEFAULT;
+            mNavigationBarWidthForRotation[mLandscapeRotation] =
+            mNavigationBarWidthForRotation[mUpsideDownRotation] = mOnScreenButtonsWidth * DisplayMetrics.DENSITY_DEVICE/DisplayMetrics.DENSITY_DEFAULT;
 
             boolean keyRebindingEnabled = Settings.System.getIntForUser(resolver,
                     Settings.System.HARDWARE_KEY_REBINDING, 0, UserHandle.USER_CURRENT) == 1;

@@ -2910,6 +2910,13 @@ public final class Settings {
         public static final String ON_SCREEN_BUTTONS_HEIGHT = "on_screen_buttons_height";
 
         /**
+         * Whether to change width of On screen Buttons.
+         * @hide
+         */
+        public static final String ON_SCREEN_BUTTONS_WIDTH = "on_screen_buttons_width";
+
+
+        /**
          * Whether or not volume button music controls should be enabled to seek media tracks
          * @hide
          */
