@@ -3854,6 +3854,13 @@ public final class Settings {
          */
         public static final String NOTIF_ALPHA = "notif_alpha";
 
+        /**
+         * wake up when plugged or unplugged
+         *
+         * @hide
+         */
+        public static final String WAKEUP_WHEN_PLUGGED_UNPLUGGED = "wakeup_when_plugged_unplugged";
+
     }
 
     /**
