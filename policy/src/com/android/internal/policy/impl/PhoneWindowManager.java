@@ -648,6 +648,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.ON_SCREEN_BUTTONS_HEIGHT), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.ON_SCREEN_BUTTONS_WIDTH), false, this);
 
             updateSettings();
         }
