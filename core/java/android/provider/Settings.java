@@ -4188,6 +4188,15 @@ public final class Settings {
          */
         public static final String NFC_POLLING_MODE = "nfc_polling_mode";
 
+        /**
+         * MediaScanner behavior on boot.
+         * 0 = enabled
+         * 1 = ask (notification)
+         * 2 = disabled
+         * @hide
+         */
+        public static final String MEDIA_SCANNER_ON_BOOT = "media_scanner_on_boot";
+
     }
 
     /**
