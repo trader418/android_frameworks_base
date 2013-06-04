@@ -4063,6 +4063,13 @@ public final class Settings {
          */
         public static final String KEY_HOME_ENABLED = "key_home_enabled";
 
+        /**
+         * whether to hide the Ram Usage Bar on recent switcher
+         *
+         * @hide
+         */
+        public static final String RECENTS_RAM_BAR = "recents_ram_bar";
+
     }
 
     /**
