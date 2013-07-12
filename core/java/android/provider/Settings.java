@@ -3065,7 +3065,15 @@ public final class Settings {
          * Whether Status Bar is currently hidden or not
          * @hide
          */
-        public static final String HIDE_STATUSBAR = "hide_statusbar"; 
+        public static final String HIDE_STATUSBAR = "hide_statusbar";
+
+	/**
+         * Peek at stausbar when it is hidden by swiping down from top
+         * end of the screen
+         *
+         * @hide
+         */
+        public static final String STATUSBAR_PEEK = "statusbar_peek";  
 
         /**
          * Whether to use a separate delay for "slide to unlock" and security
