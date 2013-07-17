@@ -2982,6 +2982,12 @@ public final class Settings {
          */
         public static final String STATUS_BAR_TRAFFIC = "status_bar_traffic";
 
+	/**
+         * Sets color of statusbar traffic indicator
+         * @hide
+         */
+        public static final String STATUS_BAR_TRAFFIC_COLOR = "status_bar_traffic_color";
+
         /**
          * Whether to use a separate delay for "slide to unlock" and security
          * lock
