@@ -74,6 +74,8 @@ public class PhoneStatusBarView extends PanelBar {
     float mAlpha;
     int mAlphaMode;
     int mStatusBarColor;
+    int mUseLockscreenAlpha;
+    float mLockscreenAlpha;
 
     private Runnable mUpdateInHomeAlpha = new Runnable() {
         @Override
@@ -363,6 +365,8 @@ public class PhoneStatusBarView extends PanelBar {
     public void updateBackgroundAlpha() {
         if(mFadingPanel != null || (isKeyguardEnabled() && mAlphaMode == 0)) {
             setBackgroundAlpha(1);
+        } else if (isKeyguardEnabled() && mUseLockscreenAlpha == 1) {
+            setBackgroundAlpha(mLockscreenAlpha);
         } else if (isKeyguardEnabled() || mAlphaMode == 2) {
             setBackgroundAlpha(mAlpha);
         } else {
@@ -418,6 +422,10 @@ public class PhoneStatusBarView extends PanelBar {
                     Settings.System.getUriFor(Settings.System.STATUS_BAR_ALPHA_MODE), false, this);
             resolver.registerContentObserver(
                     Settings.System.getUriFor(Settings.System.STATUS_BAR_COLOR), false, this);
+            resolver.registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.STATUS_BAR_LOCKSCREEN_ALPHA_USE), false, this);
+            resolver.registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.STATUS_BAR_LOCKSCREEN_ALPHA), false, this);
         }
 
         @Override
@@ -434,6 +442,11 @@ public class PhoneStatusBarView extends PanelBar {
                 Settings.System.STATUS_BAR_ALPHA_MODE, 1);
         mStatusBarColor = Settings.System.getInt(mContext.getContentResolver(),
                 Settings.System.STATUS_BAR_COLOR, -1);
+        mUseLockscreenAlpha = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.STATUS_BAR_LOCKSCREEN_ALPHA_USE, 0);
+        mLockscreenAlpha = 1.0f - Settings.System.getFloat(mContext.getContentResolver(),
+                Settings.System.STATUS_BAR_LOCKSCREEN_ALPHA,
+                0.0f);
 
         updateBackgroundAlpha();
 

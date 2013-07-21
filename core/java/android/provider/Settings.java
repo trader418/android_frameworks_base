@@ -3849,6 +3849,18 @@ public final class Settings {
         public static final String STATUS_BAR_BRIGHTNESS_SLIDER = "statusbar_brightness_slider";
 
         /**
+         * Sets if use seperate transparency of statusbar on lockscreen
+         * @hide
+         */
+        public static final String STATUS_BAR_LOCKSCREEN_ALPHA_USE = "status_bar_lockscreen_alpha_use";
+
+        /**
+         * Sets seperate transparency of statusbar on lockscreen, if used
+         * @hide
+         */
+        public static final String STATUS_BAR_LOCKSCREEN_ALPHA = "status_bar_lockscreen_alpha";
+
+        /**
          * @hide
          */
         public static final String STATUSBAR_TOGGLES_BRIGHTNESS_LOC = "statusbar_toggles_brightness_loc";
