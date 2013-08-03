@@ -2901,6 +2901,12 @@ public final class Settings {
         public static final String STATUS_BAR_BATTERY = "status_bar_battery";
 
 	/**
+         * Notifications Expand Behavior
+         * @hide
+         */
+        public static final String NOTIFICATIONS_BEHAVIOUR = "notifications_behaviour"; 
+
+        /**
          * Circle battery icon color
          * in statusbar
          */
