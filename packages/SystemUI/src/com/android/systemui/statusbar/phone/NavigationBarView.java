@@ -245,6 +245,20 @@ public class NavigationBarView extends LinearLayout implements BaseStatusBar.Nav
         updateKeyguardAlpha();
     }
 
+    private LayoutParams getLayoutParams(boolean landscape, float dp) {
+        float px = dp * getResources().getDisplayMetrics().density;
+        return landscape ?
+                new LayoutParams(LayoutParams.MATCH_PARENT, (int) px, 1f) :
+                new LayoutParams((int) px, LayoutParams.MATCH_PARENT, 1f);
+    }
+
+    private LayoutParams getSeparatorLayoutParams(boolean landscape) {
+        float px = 25 * getResources().getDisplayMetrics().density;
+        return landscape ?
+                new LayoutParams(LayoutParams.MATCH_PARENT, (int) px) :
+                new LayoutParams((int) px, LayoutParams.MATCH_PARENT);
+    }
+
     protected void updateResources() {
         final Resources res = mContext.getResources();
         mBackIcon = res.getDrawable(R.drawable.ic_sysbar_back);

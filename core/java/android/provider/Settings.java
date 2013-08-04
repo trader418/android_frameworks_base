@@ -3114,6 +3114,19 @@ public final class Settings {
         public static final String VOLUME_WAKE_SCREEN = "volume_wake_screen";
 
         /**
+         * Whether to change height of On screen Buttons.
+         * @hide
+         */
+        public static final String ON_SCREEN_BUTTONS_HEIGHT = "on_screen_buttons_height";
+
+        /**
+         * Whether to change width of On screen Buttons.
+         * @hide
+         */
+        public static final String ON_SCREEN_BUTTONS_WIDTH = "on_screen_buttons_width";
+
+
+        /**
          * Whether or not volume button music controls should be enabled to seek media tracks
          * @hide
          */
@@ -3934,6 +3947,30 @@ public final class Settings {
          * @hide
          */
         public static final String NOTIFICATION_SHORTCUTS_HIDE_CARRIER = "notification_shortcuts_hide_carrier";
+
+        /**
+         * Option to show or not navigation bar
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_SHOW = "navigation_bar_show";  
+
+	/**
+         * Height of navigation bar
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_HEIGHT = "navigation_bar_height"; 
+
+	/**
+         * Width of navigation bar
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_WIDTH = "navigation_bar_width";  
+
+	/**
+   	 * Landscape height of navigation bar
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_HEIGHT_LANDSCAPE = "navigation_bar_height_landscape";
 
     }
 
