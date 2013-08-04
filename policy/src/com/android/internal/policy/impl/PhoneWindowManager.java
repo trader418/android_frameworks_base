@@ -651,8 +651,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.ON_SCREEN_BUTTONS_HEIGHT), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.ON_SCREEN_BUTTONS_WIDTH), false, this);
-            resolver.registerContentObserver(Settings.System.getUriFor(
                      Settings.System.HIDE_STATUSBAR), false, this); 
 
             updateSettings();
