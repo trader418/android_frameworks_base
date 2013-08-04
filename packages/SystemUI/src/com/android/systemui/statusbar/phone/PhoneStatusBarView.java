@@ -38,6 +38,7 @@ import android.os.AsyncTask;
 import android.os.Broadcaster;
 import android.os.Handler;
 import android.os.UserHandle;
+import android.provider.Settings;
 import android.util.AttributeSet;
 import android.util.EventLog;
 import android.util.Slog;

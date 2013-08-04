@@ -560,19 +560,11 @@ public class PhoneStatusBar extends BaseStatusBar {
 
         updateShowSearchHoldoff();
 
-        try {
-            boolean showNav = mWindowManagerService.hasNavigationBar();
-            if (DEBUG) Slog.v(TAG, "hasNavigationBar=" + showNav);
-            if (mNavigationBarView == null && showNav && !mRecreating) {
-                mNavigationBarView =
-                    (NavigationBarView) View.inflate(context, R.layout.navigation_bar, null);
-
-                mNavigationBarView.setDisabledFlags(mDisabled);
-                mNavigationBarView.setBar(this);
-                addNavigationBarCallback(mNavigationBarView);
-            }
-        } catch (RemoteException ex) {
-            // no window manager? good luck with that
+        if (!mRecreating) {
+            mNavigationBarView =
+                (NavigationBarView) View.inflate(context, R.layout.navigation_bar, null);  
+            mNavigationBarView.setDisabledFlags(mDisabled);
+            mNavigationBarView.setBar(this);
         }
 
         // figure out which pixel-format to use for the status bar.
@@ -748,7 +740,7 @@ public class PhoneStatusBar extends BaseStatusBar {
         mShowCarrierInPanel = (mCarrierLabel != null);
         if (DEBUG) Slog.v(TAG, "carrierlabel=" + mCarrierLabel + " show=" + mShowCarrierInPanel);
         if (mShowCarrierInPanel) {
-            lpCarrierLabel = (FrameLayout.LayoutParams) mCarrierAndWifiView.getLayoutParams();
+            lpCarrierLabel = (FrameLayout.LayoutParams) mCarrierLabel.getLayoutParams();
             mCarrierLabel.setVisibility((mCarrierLabelVisible && !mNotificationShortcutsHideCarrier) ? View.VISIBLE : View.INVISIBLE);
             if (mNotificationShortcutsHideCarrier)
                 mShowCarrierInPanel = false;
