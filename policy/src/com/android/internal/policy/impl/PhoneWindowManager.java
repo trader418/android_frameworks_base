@@ -201,7 +201,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private static final int KEY_MASK_MENU = 0x04;
     private static final int KEY_MASK_ASSIST = 0x08;
     private static final int KEY_MASK_APP_SWITCH = 0x10;
-    private static final int KEY_MASK_CAMERA = 0x20;
 
     /**
      * These are the system UI flags that, when changing, can cause the layout
@@ -345,7 +344,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     boolean mHasAssistKey;
     boolean mHasAppSwitchKey;
     boolean mHasMenuKeyEnabled;
-    boolean mHasCameraKey;
 
     // The last window we were told about in focusChanged.
     WindowState mFocusedWindow;
@@ -494,7 +492,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     boolean mSearchKeyShortcutPending;
     boolean mConsumeSearchKeyUp;
     boolean mAssistKeyLongPressed;
-    boolean mCameraLongPressed;
 
     // Used when key is pressed and performing non-default action
     boolean mMenuDoCustomAction;
@@ -511,8 +508,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private String mLongPressOnAssistBehavior;
     private String mPressOnAppSwitchBehavior;
     private String mLongPressOnAppSwitchBehavior;
-    private String mPressOnCameraBehavior;
-    private String mLongPressOnCameraBehavior;
 
     // To identify simulated keypresses, so we can perform
     // the default action for that key
@@ -1215,7 +1210,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         mHasMenuKey = ((mDeviceHardwareKeys & KEY_MASK_MENU) != 0);
         mHasAssistKey = ((mDeviceHardwareKeys & KEY_MASK_ASSIST) != 0);
         mHasAppSwitchKey = ((mDeviceHardwareKeys & KEY_MASK_APP_SWITCH) != 0);
-        mHasCameraKey = ((mDeviceHardwareKeys & KEY_MASK_CAMERA) != 0);
         // readConfigurationDependentBehaviors();
 
         // register for dock events
@@ -4742,7 +4736,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             case KeyEvent.KEYCODE_MEDIA_REWIND:
             case KeyEvent.KEYCODE_MEDIA_RECORD:
             case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
-            case KeyEvent.KEYCODE_CAMERA:
                 return false;
 
             // home wake can be configurable so default to no here
