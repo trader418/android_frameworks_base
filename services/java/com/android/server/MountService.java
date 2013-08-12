@@ -210,7 +210,6 @@ class MountService extends IMountService.Stub
     private final CountDownLatch mConnectedSignal = new CountDownLatch(1);
     private final CountDownLatch mAsecsScanned = new CountDownLatch(1);
     private boolean                               mSendUmsConnectedOnBoot = false;
-    private boolean                               mUmsSupported = false;
 
     /**
      * Private hash of currently mounted secure containers.
@@ -1243,7 +1242,6 @@ class MountService extends IMountService.Stub
                                     allowMassStorage, maxFileSize, null);
                             addVolumeLocked(volume);
                         }
-                        mUmsSupported |= allowMassStorage;
                     }
 
                     a.recycle();
@@ -1331,13 +1329,6 @@ class MountService extends IMountService.Stub
 
         // XXX: This will go away soon in favor of IMountServiceObserver
         mPms = (PackageManagerService) ServiceManager.getService("package");
-
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(Intent.ACTION_BOOT_COMPLETED);
-        // don't bother monitoring USB if mass storage is not supported
-        if (mUmsSupported) {
-            filter.addAction(UsbManager.ACTION_USB_STATE);
-        }
 
         mHandlerThread = new HandlerThread("MountService");
         mHandlerThread.start();
