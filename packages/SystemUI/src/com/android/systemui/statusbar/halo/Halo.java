@@ -66,7 +66,6 @@ import android.provider.Settings;
 import android.service.notification.INotificationListener;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.ExtendedPropertiesUtils;
 import android.util.Log;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
@@ -107,9 +106,8 @@ import com.android.systemui.statusbar.StatusBarIconView;
 import com.android.systemui.statusbar.NotificationData;
 import com.android.systemui.statusbar.BaseStatusBar;
 import com.android.systemui.statusbar.phone.Ticker;
-import com.android.systemui.statusbar.tablet.TabletTicker;
 
-public class Halo extends FrameLayout implements Ticker.TickerCallback, TabletTicker.TabletTickerCallback {
+public class Halo extends FrameLayout implements Ticker.TickerCallback {
 
     public static final String TAG = "HaloLauncher";
 
@@ -456,11 +454,8 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback, TabletTi
         } catch (android.os.RemoteException ex) {
             // failed to register listener
         }
-        if(ExtendedPropertiesUtils.isTablet()) {
-            if (mBar.getTabletTicker() != null) mBar.getTabletTicker().setUpdateEvent(this);
-        } else {
-            if (mBar.getTicker() != null) mBar.getTicker().setUpdateEvent(this);
-        }
+        if (mBar.getTicker() != null) mBar.getTicker().setUpdateEvent(this);
+ 
         mNotificationData = mBar.getNotificationData();
         loadLastNotification(true);
     }
@@ -887,11 +882,7 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback, TabletTi
         mEffect.unscheduleSleep();
         mHandler.removeCallbacksAndMessages(null);
         // Kill callback
-        if(ExtendedPropertiesUtils.isTablet()) {
-            if (mBar.getTabletTicker() != null) mBar.getTabletTicker().setUpdateEvent(null);
-        } else {
-             mBar.getTicker().setUpdateEvent(null);
-        }
+        mBar.getTicker().setUpdateEvent(null);
         // Flag tasker
         mBar.setHaloTaskerActive(false, false);
         // Kill the effect layer
