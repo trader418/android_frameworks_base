@@ -3156,10 +3156,16 @@ public final class Settings {
         public static final String EXPANDED_DESKTOP_STYLE = "expanded_desktop_style";
 
         /**
+         * Hide network speed indicator when there is no traffic
+         * @hide
+         */
+        public static final String STATUS_BAR_TRAFFIC_HIDE = "status_bar_traffic_hide";
+
+        /**
          * Network speed indicator
          * @hide
          */
-        public static final String STATUS_BAR_TRAFFIC = "status_bar_traffic";
+        public static final String STATUS_BAR_TRAFFIC_ENABLE = "status_bar_traffic_enable";
 
 	/**
          * Sets color of statusbar traffic indicator
