@@ -20,8 +20,7 @@ import android.widget.TextView;
 public class Traffic extends TextView {
      private boolean mAttached;
      TrafficStats mTrafficStats;
-     boolean enable_TrafficMeter;
-     boolean TrafficMeter_hide; 
+     boolean showTraffic;
      Handler mHandler;
      Handler mTrafficHandler;
      float speed;
@@ -39,9 +38,7 @@ public class Traffic extends TextView {
            ContentResolver resolver = mContext.getContentResolver();
 
 	   resolver.registerContentObserver(Settings.System
-               .getUriFor(Settings.System.STATUS_BAR_TRAFFIC_ENABLE), false, this);
-      	   resolver.registerContentObserver(Settings.System
-               .getUriFor(Settings.System.STATUS_BAR_TRAFFIC_HIDE), false, this); 
+               .getUriFor(Settings.System.STATUS_BAR_TRAFFIC), false, this);
 	   resolver.registerContentObserver(Settings.System
 	       .getUriFor(Settings.System.STATUS_BAR_TRAFFIC_COLOR), false, this);
 
@@ -118,12 +115,6 @@ public class Traffic extends TextView {
 		} else {
 			setText(DecimalFormatfnum.format(speed) + "KB/s");
 		}
-		// Hide if there is no traffic
-                if ((TrafficMeter_hide) && (speed == 0)) {
-                   setVisibility(View.GONE);
-                } else {
-                   setVisibility(View.VISIBLE);
-                } 
 		update();
 		super.handleMessage(msg);
 	    }
@@ -159,11 +150,9 @@ public class Traffic extends TextView {
 
     private void updateSettings() {
 	ContentResolver resolver = mContext.getContentResolver();
-		
-	enable_TrafficMeter = (Settings.System.getInt(resolver,
-                Settings.System.STATUS_BAR_TRAFFIC_ENABLE, 0) == 1);
-        TrafficMeter_hide = (Settings.System.getInt(resolver,
-                Settings.System.STATUS_BAR_TRAFFIC_HIDE, 1) == 1);  
+
+	showTraffic = (Settings.System.getInt(resolver,
+		Settings.System.STATUS_BAR_TRAFFIC, 1) == 1);
 	int defaultColor = Settings.System.getInt(resolver, 
 		Settings.System.STATUS_BAR_TRAFFIC_COLOR, 0xFF33b5e5);
 
@@ -175,14 +164,15 @@ public class Traffic extends TextView {
             mStatusBarTrafficColor = defaultColor;
         }
         
-	if (enable_TrafficMeter && getConnectAvailable()) {
-      	    setVisibility(View.VISIBLE); 
+	if (showTraffic && getConnectAvailable()) {
 	    if (mAttached) {
 	        updateTraffic();
     	    }
+	        setVisibility(View.VISIBLE);
 	} else {
 	    setVisibility(View.GONE);
 	}
-	setTextColor(mStatusBarTrafficColor);       
+	setTextColor(mStatusBarTrafficColor);
+        
     }
 }
