@@ -2706,7 +2706,14 @@ public final class Settings {
          * See class PieColorUtils for more information on this.
          * @hide
          */
-        public static final String PIE_COLORS = "pie_colors"; 
+        public static final String PIE_COLORS = "pie_colors";
+
+	/**
+         * Quick Settings Disable Panel
+         *
+         * @hide
+         */
+        public static final String QS_DISABLE_PANEL = "qs_disable_panel";  
 
 	/**
          * Quick Settings Quick Pulldown if no notifications are present
@@ -2715,7 +2722,7 @@ public final class Settings {
          */
         public static final String QS_NO_NOTIFICATION_PULLDOWN = "qs_no_notification_pulldown";
 
-        /**
+	/**
          * Quick Settings Panel Tiles to Use
          *
          * @hide

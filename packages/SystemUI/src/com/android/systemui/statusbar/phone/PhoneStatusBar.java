@@ -234,8 +234,8 @@ public class PhoneStatusBar extends BaseStatusBar {
 
     // settings
     QuickSettingsController mQS;
-    boolean mHasSettingsPanel, mHasFlipSettings;
-    boolean mUiModeIsToggled;
+    boolean mHasSettingsPanel, mHideSettingsPanel, mHasFlipSettings; 
+    boolean mUiModeIsToggled; 
     SettingsPanelView mSettingsPanel;
     View mFlipSettingsView;
     QuickSettingsContainerView mSettingsContainer;
@@ -636,7 +636,14 @@ public class PhoneStatusBar extends BaseStatusBar {
         mClearButton.setEnabled(false);
         mDateView = (DateView)mStatusBarWindow.findViewById(R.id.date);
 
-	mHasSettingsPanel = res.getBoolean(R.bool.config_hasSettingsPanel);
+	if (mStatusBarView.hasFullWidthNotifications()) {
+            mHideSettingsPanel = Settings.System.getInt(mContext.getContentResolver(),
+                                    Settings.System.QS_DISABLE_PANEL, 0) == 1;
+            mHasSettingsPanel = res.getBoolean(R.bool.config_hasSettingsPanel) && !mHideSettingsPanel;
+        } else {
+            mHideSettingsPanel = false;
+            mHasSettingsPanel = res.getBoolean(R.bool.config_hasSettingsPanel);
+        } 
         mHasFlipSettings = res.getBoolean(R.bool.config_hasFlipSettingsPanel);
 
         mDateTimeView = mNotificationPanelHeader.findViewById(R.id.datetime);
@@ -2185,7 +2192,8 @@ public class PhoneStatusBar extends BaseStatusBar {
             mHaloButtonVisible = true;
             updateHaloButton(); 
             mNotificationPanel.setVisibility(View.GONE);
-            mFlipSettingsView.setVisibility(View.GONE);
+            if (!mHideSettingsPanel)
+                mFlipSettingsView.setVisibility(View.GONE); 
             mNotificationButton.setVisibility(View.GONE);
             setAreThereNotifications(); // show the clear button
         }
@@ -3394,6 +3402,12 @@ public class PhoneStatusBar extends BaseStatusBar {
 
 	setNotificationWallpaperHelper();
 
+	boolean hideSettingsPanel = Settings.System.getInt(mContext.getContentResolver(),
+                                    Settings.System.QS_DISABLE_PANEL, 0) == 1;
+        if (hideSettingsPanel != mHideSettingsPanel) {
+                recreateStatusBar();
+        } 
+
         if (mSettingsContainer != null) {
 	        mQS.setupQuickSettings();
             } 
@@ -3441,12 +3455,16 @@ public class PhoneStatusBar extends BaseStatusBar {
 
             cr.registerContentObserver(
                     Settings.System.getUriFor(Settings.System.NOTIF_WALLPAPER_ALPHA),
-                    false, this);
+                    false, this, UserHandle.USER_ALL);
                     setNotificationWallpaperHelper();
 
 	    cr.registerContentObserver(
                     Settings.System.getUriFor(Settings.System.NOTIF_ALPHA),
-                    false, this);
+                    false, this, UserHandle.USER_ALL);
+
+	    cr.registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.QS_DISABLE_PANEL),
+                    false, this);   
         }
     }
 
