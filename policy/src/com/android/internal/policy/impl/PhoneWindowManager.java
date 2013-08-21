@@ -2502,7 +2502,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             }
             // Remember that home is pressed and handle special actions.
             if (repeatCount == 0) {
-                mHomePressed = true;
+                if (down) {
+                    mHomePressed = true;
+                }
                 if (mHomeDoubleTapPending) {
                     mHomeDoubleTapPending = false;
                     mHandler.removeCallbacks(mHomeDoubleTapTimeoutRunnable);
