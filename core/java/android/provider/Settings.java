@@ -3006,6 +3006,14 @@ public final class Settings {
          */
         public static final String APP_SIDEBAR_SHOW_TRIGGER = "app_sidebar_show_trigger";
 
+ 	/**
+         * use Alt Activity Resolver Grid
+         * boolean
+         *
+         * @hide
+         */
+        public static final String ACTIVITY_RESOLVER_USE_ALT = "activity_resolver_use_alt"; 
+
 	/**
          * Notifications Expand Behavior
          * @hide
