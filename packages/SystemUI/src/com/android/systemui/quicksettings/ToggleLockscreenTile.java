@@ -32,6 +32,9 @@ public class ToggleLockscreenTile extends QuickSettingsTile {
                 mDisabledLockscreen = !mDisabledLockscreen;
                 mPrefs.edit().putBoolean(KEY_DISABLED, mDisabledLockscreen).apply();
                 updateResources();
+		if (isFlipTilesEnabled()) {
+                    flipTile(0);
+                }
             }
         };
 
