@@ -148,7 +148,6 @@ public class PhoneStatusBar extends BaseStatusBar {
     private static final int MSG_OPEN_NOTIFICATION_PANEL = 1000;
     private static final int MSG_CLOSE_PANELS = 1001;
     private static final int MSG_OPEN_SETTINGS_PANEL = 1002;
-    private static final int MSG_STATUSBAR_BRIGHTNESS = 1003;
     // 1020-1030 reserved for BaseStatusBar
 
     // will likely move to a resource or other tunable param at some point
@@ -340,12 +339,6 @@ public class PhoneStatusBar extends BaseStatusBar {
         ? new GestureRecorder("/sdcard/statusbar_gestures.dat")
         : null;
 
-    // brightness slider
-    private int mIsBrightNessMode = 0;
-    private int mIsStatusBarBrightNess;
-    private boolean mIsAutoBrightNess;
-    private Float mPropFactor;
-
     private int mNavigationIconHints = 0;
     private final Animator.AnimatorListener mMakeIconsInvisible = new AnimatorListenerAdapter() {
         @Override
@@ -390,7 +383,7 @@ public class PhoneStatusBar extends BaseStatusBar {
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_BRIGHTNESS_CONTROL), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.SCREEN_BRIGHTNESS_MODE), false, this, mCurrentUserId);
+                    Settings.System.SCREEN_BRIGHTNESS_MODE), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.AUTO_HIDE_STATUSBAR), false, this, UserHandle.USER_ALL); 
             resolver.registerContentObserver(Settings.System.getUriFor(
@@ -409,11 +402,11 @@ public class PhoneStatusBar extends BaseStatusBar {
 
         public void update() {
             ContentResolver resolver = mContext.getContentResolver();
-            boolean autoBrightness = Settings.System.getIntForUser(
-                    resolver, Settings.System.SCREEN_BRIGHTNESS_MODE, 0, mCurrentUserId) ==
-                    Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC;
-            mBrightnessControl = !autoBrightness && Settings.System.getInt(
-                    resolver, Settings.System.STATUS_BAR_BRIGHTNESS_CONTROL, 0) == 1;
+            int brightnessValue = Settings.System.getIntForUser(resolver,
+                    Settings.System.SCREEN_BRIGHTNESS_MODE, 0, UserHandle.USER_CURRENT);
+            mBrightnessControl = brightnessValue != Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
+                    && Settings.System.getIntForUser(resolver, Settings.System.STATUS_BAR_BRIGHTNESS_CONTROL,
+                            0, UserHandle.USER_CURRENT) == 1;
             mNotificationShortcutsToggle = Settings.System.getIntForUser(resolver,
                     Settings.System.NOTIFICATION_SHORTCUTS_TOGGLE, 0, UserHandle.USER_CURRENT) != 0;
             mNotificationShortcutsHideCarrier = Settings.System.getIntForUser(resolver,
@@ -911,10 +904,6 @@ public class PhoneStatusBar extends BaseStatusBar {
         mNotificationShortcutsLayout.setupShortcuts();
 
         mVelocityTracker = VelocityTracker.obtain();
-
-        mIsAutoBrightNess = checkAutoBrightNess();
-
-        updatePropFactorValue();
 
         return mStatusBarView;
     }
@@ -1767,14 +1756,6 @@ public class PhoneStatusBar extends BaseStatusBar {
                     setIntruderAlertVisibility(false);
                     mCurrentlyIntrudingNotification = null;
                     break;
-                case MSG_STATUSBAR_BRIGHTNESS:
-                    if (mIsStatusBarBrightNess == 1) {
-                        mIsBrightNessMode = 1;
-                        // don't collapse the statusbar to see %
-                        // updateExpandedViewPos(0);
-                        // performCollapse();
-                    }
-                    break;
             }
         }
     }
@@ -2381,14 +2362,7 @@ public class PhoneStatusBar extends BaseStatusBar {
                     }
                 } else {
                     mHandler.removeCallbacks(mLongPressBrightnessChange);
-                    // remove brightness events from being posted, change mode
-                    if (mIsStatusBarBrightNess == 1) {
-
-                        if (mIsBrightNessMode == 1) {
-                            mIsBrightNessMode = 2;
-                        }
-                    }
-              }
+                }
             } else if (action == MotionEvent.ACTION_UP
                     || action == MotionEvent.ACTION_CANCEL) {
                 mHandler.removeCallbacks(mLongPressBrightnessChange);
@@ -2439,13 +2413,6 @@ public class PhoneStatusBar extends BaseStatusBar {
             hideCling();
         }
 
-        if (mIsStatusBarBrightNess == 1) {
-             mIsBrightNessMode = 0;
-             if (!mIsAutoBrightNess) {
-                 mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG_STATUSBAR_BRIGHTNESS),
-                 ViewConfiguration.getGlobalActionKeyTimeout());
-                 }
-        }
         return false;
     }
 
@@ -3460,71 +3427,4 @@ public class PhoneStatusBar extends BaseStatusBar {
                     false, this);   
         }
     }
-
-    private boolean checkAutoBrightNess() {
-        return Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.SCREEN_BRIGHTNESS_MODE,
-                Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL,
-                mCurrentUserId) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC;
-    }
-
-    private void updatePropFactorValue() {
-        mPropFactor = Float.valueOf((float) android.os.PowerManager.BRIGHTNESS_ON
-                / Integer.valueOf(mDisplay.getWidth()).floatValue());
-    }
-
-    private void doBrightNess(MotionEvent e) {
-        int screenBrightness;
-        try {
-            screenBrightness = checkMinMax(Float.valueOf((e.getRawX() * mPropFactor.floatValue()))
-                    .intValue());
-            Settings.System.putInt(mContext.getContentResolver(), "screen_brightness",
-                    screenBrightness);
-        } catch (NullPointerException e2) {
-            return;
-        }
-        double percent = ((screenBrightness / (double) 255) * 100) + 0.5;
-
-    }
-
-    private void setNotificationWallpaperHelper() {
-        float wallpaperAlpha = Settings.System.getFloat(mContext.getContentResolver(), Settings.System.NOTIF_WALLPAPER_ALPHA, 0.1f);
-        String notifiBack = Settings.System.getString(mContext.getContentResolver(), Settings.System.NOTIFICATION_BACKGROUND);
-        File file = new File(NOTIF_WALLPAPER_IMAGE_PATH);
-        mNotificationPanel.setBackgroundResource(0);
-        mNotificationPanel.setBackgroundResource(R.drawable.notification_panel_bg);
-        Drawable background = mNotificationPanel.getBackground();
-        background.setAlpha(0);
-        if (!file.exists()) {
-            if (notifiBack != null && !notifiBack.isEmpty()) {
-                background.setColorFilter(Integer.parseInt(notifiBack), Mode.SRC_ATOP);
-            }
-         background.setAlpha((int) ((1-wallpaperAlpha) * 255));
-        }
-        float notifAlpha = Settings.System.getFloat(mContext.getContentResolver(), Settings.System.NOTIF_ALPHA, 0.0f);
-        if (mPile != null) {
-            int N = mNotificationData.size();
-            for (int i=0; i<N; i++) {
-              Entry ent = mNotificationData.get(N-i-1);
-              View expanded = ent.expanded;
-              if (expanded !=null && expanded.getBackground()!=null) expanded.getBackground().setAlpha((int) ((1-notifAlpha) * 255));
-              View large = ent.getLargeView();
-              if (large != null && large.getBackground()!=null) large.getBackground().setAlpha((int) ((1-notifAlpha) * 255));
-            }
-        }
-    }
-
-    private int checkMinMax(int brightness) {
-        int min = 0;
-        int max = 255;
-
-        if (min > brightness) // brightness < 0x1E
-            return min;
-        else if (max < brightness) { // brightness > 0xFF
-            return max;
-        }
-
-        return brightness;
-    }
-
 }

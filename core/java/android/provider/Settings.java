@@ -3955,11 +3955,6 @@ public final class Settings {
             Secure.WIFI_WATCHDOG_PING_TIMEOUT_MS;
 
         /**
-         * @hide
-         */
-        public static final String STATUS_BAR_BRIGHTNESS_SLIDER = "statusbar_brightness_slider";
-
-        /**
          * Sets if use seperate transparency of statusbar on lockscreen
          * @hide
          */
@@ -3970,11 +3965,6 @@ public final class Settings {
          * @hide
          */
         public static final String STATUS_BAR_LOCKSCREEN_ALPHA = "status_bar_lockscreen_alpha";
-
-        /**
-         * @hide
-         */
-        public static final String STATUSBAR_TOGGLES_BRIGHTNESS_LOC = "statusbar_toggles_brightness_loc";
 
         /**
          * Sets the portrait background of notification drawer
