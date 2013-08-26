@@ -709,6 +709,7 @@
   <java-symbol type="string" name="progress_unmounting" />
   <java-symbol type="string" name="mobile_provisioning_url" />
   <java-symbol type="string" name="mobile_redirected_provisioning_url" />
+  <java-symbol type="string" name="progress_nomediapresent" />
   <java-symbol type="string" name="reboot_safemode_confirm" />
   <java-symbol type="string" name="reboot_safemode_title" />
   <java-symbol type="string" name="relationTypeAssistant" />
@@ -2057,5 +2058,8 @@
 
   <!-- Screenshort Trash -->
   <java-symbol type="string" name="trash" />
+
+  <!-- Irda Service -->
+  <java-symbol type="bool" name="config_enableIrdaManagerService" />
 
 </resources>
