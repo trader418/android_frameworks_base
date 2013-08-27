@@ -232,7 +232,7 @@ public class PhoneStatusBar extends BaseStatusBar {
 
     // settings
     QuickSettingsController mQS;
-    boolean mHasSettingsPanel, mHideSettingsPanel, mHasFlipSettings; 
+    boolean mHasSettingsPanel, mHasFlipSettings; 
     boolean mUiModeIsToggled; 
     SettingsPanelView mSettingsPanel;
     View mFlipSettingsView;
@@ -655,14 +655,7 @@ public class PhoneStatusBar extends BaseStatusBar {
         mClearButton.setVisibility(View.GONE);
         mClearButton.setEnabled(false);
 
-	if (mStatusBarView.hasFullWidthNotifications()) {
-            mHideSettingsPanel = Settings.System.getInt(mContext.getContentResolver(),
-                                    Settings.System.QS_DISABLE_PANEL, 0) == 1;
-            mHasSettingsPanel = res.getBoolean(R.bool.config_hasSettingsPanel) && !mHideSettingsPanel;
-        } else {
-            mHideSettingsPanel = false;
-            mHasSettingsPanel = res.getBoolean(R.bool.config_hasSettingsPanel);
-        } 
+	mHasSettingsPanel = res.getBoolean(R.bool.config_hasSettingsPanel);  
         mHasFlipSettings = res.getBoolean(R.bool.config_hasFlipSettingsPanel);
 
         mSettingsButton = (ImageView) mStatusBarWindow.findViewById(R.id.settings_button);
@@ -873,7 +866,7 @@ public class PhoneStatusBar extends BaseStatusBar {
             }
         }
 
-        mClingShown = ! (DEBUG_CLINGS
+	mClingShown = ! (DEBUG_CLINGS
             || !Prefs.read(mContext).getBoolean(Prefs.SHOWN_QUICK_SETTINGS_HELP, false));
 
         if (!ENABLE_NOTIFICATION_PANEL_CLING || ActivityManager.isRunningInTestHarness()) {
@@ -2220,8 +2213,7 @@ public class PhoneStatusBar extends BaseStatusBar {
             mHaloButtonVisible = true;
             updateHaloButton(); 
             mNotificationPanel.setVisibility(View.GONE);
-            if (!mHideSettingsPanel)
-                mFlipSettingsView.setVisibility(View.GONE); 
+            mFlipSettingsView.setVisibility(View.GONE);  
             mNotificationButton.setVisibility(View.GONE);
             setAreThereNotifications(); // show the clear button
         }
@@ -3452,10 +3444,6 @@ public class PhoneStatusBar extends BaseStatusBar {
 
 	    setNotificationWallpaperHelper();
 
-	    boolean hideSettingsPanel = Settings.System.getInt(mContext.getContentResolver(),
-                                    Settings.System.QS_DISABLE_PANEL, 0) == 1;
-            if (hideSettingsPanel != mHideSettingsPanel) {
-                    recreateStatusBar();
             } 
         }
 
@@ -3499,10 +3487,6 @@ public class PhoneStatusBar extends BaseStatusBar {
                     false, this, UserHandle.USER_ALL);
 
 	    cr.registerContentObserver(
-                    Settings.System.getUriFor(Settings.System.QS_DISABLE_PANEL),
-                    false, this);   
-
-            cr.registerContentObserver(
                     Settings.System.getUriFor(Settings.System.QS_QUICK_ACCESS),
                     false, this, UserHandle.USER_ALL);
 

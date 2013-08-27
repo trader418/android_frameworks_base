@@ -2731,13 +2731,6 @@ public final class Settings {
         public static final String PIE_COLORS = "pie_colors";
 
 	/**
-         * Quick Settings Disable Panel
-         *
-         * @hide
-         */
-        public static final String QS_DISABLE_PANEL = "qs_disable_panel";  
-
-	/**
          * Quick Settings Quick Pulldown if no notifications are present
          *
          * @hide
