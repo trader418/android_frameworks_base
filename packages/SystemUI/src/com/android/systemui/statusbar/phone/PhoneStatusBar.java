@@ -3444,7 +3444,6 @@ public class PhoneStatusBar extends BaseStatusBar {
 
 	    setNotificationWallpaperHelper();
 
-            } 
         }
 
         public void startObserving() {
