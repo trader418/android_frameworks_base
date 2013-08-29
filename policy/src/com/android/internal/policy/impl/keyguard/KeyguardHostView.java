@@ -38,13 +38,12 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.media.RemoteControlClient;
-import android.os.Bundle;
 import android.os.Looper;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -80,7 +79,6 @@ public class KeyguardHostView extends KeyguardViewBase {
     static final int TRANSPORT_VISIBLE = 2;
 
     private int mTransportState = TRANSPORT_GONE;
-    private boolean mTransportShouldBeVisible;
 
     // Use this to debug all of keyguard
     public static boolean DEBUG = KeyguardViewMediator.DEBUG;
@@ -89,11 +87,12 @@ public class KeyguardHostView extends KeyguardViewBase {
     // Found in KeyguardAppWidgetPickActivity.java
     static final int APPWIDGET_HOST_ID = 0x4B455947;
 
-    private final int MAX_WIDGETS = 9;
+    private final int MAX_WIDGETS = 20;
 
     private AppWidgetHost mAppWidgetHost;
     private AppWidgetManager mAppWidgetManager;
     private KeyguardWidgetPager mAppWidgetContainer;
+    private KeyguardWidgetPager mAppWidgetContainerHidden;
     private KeyguardSecurityViewFlipper mSecurityViewContainer;
     private KeyguardSelectorView mKeyguardSelectorView;
     private KeyguardTransportControlView mTransportControl;
@@ -123,6 +122,12 @@ public class KeyguardHostView extends KeyguardViewBase {
     private boolean mSafeModeEnabled;
 
     private boolean mUserSetupCompleted;
+
+    /*package*/ interface TransportCallback {
+        void onListenerDetached();
+        void onListenerAttached();
+        void onPlayStateChanged();
+    }
 
     // User for whom this host view was created.  Final because we should never change the
     // id without reconstructing an instance of KeyguardHostView. See note below...
@@ -154,6 +159,11 @@ public class KeyguardHostView extends KeyguardViewBase {
         if (DEBUG) Log.e(TAG, "KeyguardHostView()");
 
         mLockPatternUtils = new LockPatternUtils(context);
+        mAppWidgetHost = new AppWidgetHost(
+                context, APPWIDGET_HOST_ID, mOnClickHandler, Looper.myLooper());
+
+        mAppWidgetManager = AppWidgetManager.getInstance(mContext);
+        mSecurityModel = new KeyguardSecurityModel(context);
 
         // Note: This depends on KeyguardHostView getting reconstructed every time the
         // user switches, since mUserId will be used for the entire session.
@@ -168,7 +178,10 @@ public class KeyguardHostView extends KeyguardViewBase {
             mCameraDisabled = dpm.getCameraDisabled(null);
         }
 
+        cleanupAppWidgetIds();
         mSafeModeEnabled = LockPatternUtils.isSafeModeEnabled();
+        mUserSetupCompleted = Settings.Secure.getIntForUser(mContext.getContentResolver(),
+                Settings.Secure.USER_SETUP_COMPLETE, 0, UserHandle.USER_CURRENT) != 0;
 
         // These need to be created with the user context...
         Context userContext = null;
@@ -185,8 +198,6 @@ public class KeyguardHostView extends KeyguardViewBase {
 
         mAppWidgetHost = new AppWidgetHost(userContext, APPWIDGET_HOST_ID, mOnClickHandler,
                 Looper.myLooper());
-
-        cleanupAppWidgetIds();
 
         mAppWidgetManager = AppWidgetManager.getInstance(userContext);
 
@@ -244,7 +255,7 @@ public class KeyguardHostView extends KeyguardViewBase {
                         if (widgetsDisabledByDpm()) {
                             // Ignore attempts to delete the fallback widget when widgets
                             // are disabled
-                            continue;
+                        continue;
                         } else {
                             // Reset fallback widget id in the event that widgets have been
                             // enabled, and fallback widget is being deleted
@@ -402,9 +413,6 @@ public class KeyguardHostView extends KeyguardViewBase {
 
         setBackButtonEnabled(false);
 
-        mTransportShouldBeVisible = Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.LOCKSCREEN_MUSIC_CONTROLS, 1, UserHandle.USER_CURRENT) != 0;
-
         updateBackground();
         addDefaultWidgets();
 
@@ -414,6 +422,7 @@ public class KeyguardHostView extends KeyguardViewBase {
         }
         checkAppWidgetConsistency();
         mSwitchPageRunnable.run();
+
         // This needs to be called after the pages are all added.
         mViewStateManager.showUsabilityHints();
 
@@ -449,6 +458,9 @@ public class KeyguardHostView extends KeyguardViewBase {
         }
 
         Drawable back = null;
+        int bgAlpha = (int)((1 - (Settings.System.getFloatForUser(getContext().getContentResolver(),
+                Settings.System.LOCKSCREEN_ALPHA, 0.0f, UserHandle.USER_CURRENT))) * 255);
+
         if (!background.isEmpty()) {
             try {
                 back = new ColorDrawable(Integer.parseInt(background));
@@ -466,8 +478,14 @@ public class KeyguardHostView extends KeyguardViewBase {
             }
         }
         if (back != null) {
-            back.setColorFilter(BACKGROUND_COLOR, PorterDuff.Mode.SRC_ATOP);
-            setBackground(back);
+            back.setAlpha(bgAlpha);
+            Drawable overlay = new ColorDrawable(BACKGROUND_COLOR);
+            Drawable[] layers = new Drawable[] {
+                back,
+                overlay
+            };
+            LayerDrawable layerDrawable = new LayerDrawable(layers);
+            setBackground(layerDrawable);
         }
     }
 
@@ -678,9 +696,9 @@ public class KeyguardHostView extends KeyguardViewBase {
             case Pattern:
                 messageId = R.string.kg_too_many_failed_pattern_attempts_dialog_message;
                 break;
-            case Gesture:
+	    case Gesture:
                 messageId = R.string.kg_too_many_failed_gesture_attempts_dialog_message;
-                break;
+                break; 
             case PIN:
                 messageId = R.string.kg_too_many_failed_pin_attempts_dialog_message;
                 break;
@@ -778,15 +796,26 @@ public class KeyguardHostView extends KeyguardViewBase {
      * @param turningOff true if the device is being turned off
      */
     void showPrimarySecurityScreen(boolean turningOff) {
-        SecurityMode securityMode = mSecurityModel.getSecurityMode();
-        if (DEBUG) Log.v(TAG, "showPrimarySecurityScreen(turningOff=" + turningOff + ")");
-        if (!turningOff &&
-                KeyguardUpdateMonitor.getInstance(mContext).isAlternateUnlockEnabled()) {
-            // If we're not turning off, then allow biometric alternate.
-            // We'll reload it when the device comes back on.
-            securityMode = mSecurityModel.getAlternateFor(securityMode);
+        final boolean lockBeforeUnlock = Settings.Secure.getIntForUser(mContext.getContentResolver(),
+                Settings.Secure.LOCK_BEFORE_UNLOCK, 0, UserHandle.USER_CURRENT) == 1;
+        final boolean isSimOrAccount = mCurrentSecuritySelection == SecurityMode.SimPin
+                || mCurrentSecuritySelection == SecurityMode.SimPuk
+                || mCurrentSecuritySelection == SecurityMode.Account
+                || mCurrentSecuritySelection == SecurityMode.Invalid;
+
+        if (lockBeforeUnlock && !isSimOrAccount) {
+            showSecurityScreen(SecurityMode.None);
+        } else {
+            SecurityMode securityMode = mSecurityModel.getSecurityMode();
+            if (DEBUG) Log.v(TAG, "showPrimarySecurityScreen(turningOff=" + turningOff + ")");
+            if (!turningOff &&
+                    KeyguardUpdateMonitor.getInstance(mContext).isAlternateUnlockEnabled()) {
+                // If we're not turning off, then allow biometric alternate.
+                // We'll reload it when the device comes back on.
+                securityMode = mSecurityModel.getAlternateFor(securityMode);
+            }
+            showSecurityScreen(securityMode);
         }
-        showSecurityScreen(securityMode);
     }
 
     /**
@@ -831,7 +860,7 @@ public class KeyguardHostView extends KeyguardViewBase {
                 case PIN:
                 case Account:
                 case Biometric:
-                case Gesture:
+		case Gesture: 
                     finish = true;
                     break;
 
@@ -1082,6 +1111,7 @@ public class KeyguardHostView extends KeyguardViewBase {
         if (mViewStateManager != null) {
             mViewStateManager.showUsabilityHints();
         }
+
         minimizeChallengeIfDesired();
         requestFocus();
     }
@@ -1157,11 +1187,9 @@ public class KeyguardHostView extends KeyguardViewBase {
             return;
         }
 
-        int setting = Settings.System.getIntForUser(getContext().getContentResolver(),
-                Settings.System.LOCKSCREEN_MAXIMIZE_WIDGETS, 0, UserHandle.USER_CURRENT);
-
-        if (setting == 1) {
-            mSlidingChallengeLayout.showChallenge(false);
+        if (Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.LOCKSCREEN_MAXIMIZE_WIDGETS, 0, UserHandle.USER_CURRENT) == 1) {
+            mSlidingChallengeLayout.fadeOutChallenge();
         }
     }
 
@@ -1169,7 +1197,7 @@ public class KeyguardHostView extends KeyguardViewBase {
         switch (securityMode) {
             case None: return R.id.keyguard_selector_view;
             case Pattern: return R.id.keyguard_pattern_view;
-            case Gesture: return R.id.keyguard_gesture_view;
+	    case Gesture: return R.id.keyguard_gesture_view; 
             case PIN: return R.id.keyguard_pin_view;
             case Password: return R.id.keyguard_password_view;
             case Biometric: return R.id.keyguard_face_unlock_view;
@@ -1184,7 +1212,7 @@ public class KeyguardHostView extends KeyguardViewBase {
         switch (securityMode) {
             case None: return R.layout.keyguard_selector_view;
             case Pattern: return R.layout.keyguard_pattern_view;
-            case Gesture: return R.layout.keyguard_gesture_view;
+	    case Gesture: return R.layout.keyguard_gesture_view; 
             case PIN: return R.layout.keyguard_pin_view;
             case Password: return R.layout.keyguard_password_view;
             case Biometric: return R.layout.keyguard_face_unlock_view;
@@ -1200,10 +1228,6 @@ public class KeyguardHostView extends KeyguardViewBase {
         AppWidgetProviderInfo appWidgetInfo = mAppWidgetManager.getAppWidgetInfo(appId);
         if (appWidgetInfo != null) {
             AppWidgetHostView view = mAppWidgetHost.createView(mContext, appId, appWidgetInfo);
-            Bundle options = new Bundle();
-            options.putInt(AppWidgetManager.OPTION_APPWIDGET_HOST_CATEGORY,
-                AppWidgetProviderInfo.WIDGET_CATEGORY_KEYGUARD);
-            view.updateAppWidgetOptions(options);
             addWidget(view, pageIndex);
             return true;
         } else {
@@ -1291,7 +1315,7 @@ public class KeyguardHostView extends KeyguardViewBase {
         }
 
         // We currently disable cameras in safe mode because we support loading 3rd party
-        // cameras we can't trust.  TODO: plumb safe mode into camera creation code and only
+        // cameras we can't trust. TODO: plumb safe mode into camera creation code and only
         // inflate system-provided camera?
         if (!mSafeModeEnabled && !cameraDisabledByDpm() && mUserSetupCompleted
                 && mContext.getResources().getBoolean(R.bool.kg_enable_camera_default_widget)) {
@@ -1556,7 +1580,7 @@ public class KeyguardHostView extends KeyguardViewBase {
         final boolean showing = getWidgetPosition(R.id.keyguard_transport_control) != -1;
         final boolean visible = state == TRANSPORT_VISIBLE;
         final boolean shouldBeVisible = state == TRANSPORT_INVISIBLE && isMusicPlaying(state);
-        if (!showing && mTransportShouldBeVisible && (visible || shouldBeVisible)) {
+        if (!showing && (visible || shouldBeVisible)) {
             if (DEBUGXPORT) Log.v(TAG, "add transport");
             // insert to left of camera if it exists, otherwise after right-most widget
             int lastWidget = mAppWidgetContainer.getChildCount() - 1;
@@ -1566,7 +1590,7 @@ public class KeyguardHostView extends KeyguardViewBase {
                         lastWidget : lastWidget + 1;
             }
             mAppWidgetContainer.addWidget(getOrCreateTransportControl(), position);
-        } else if (showing && (state == TRANSPORT_GONE || !mTransportShouldBeVisible)) {
+        } else if (showing && state == TRANSPORT_GONE) {
             if (DEBUGXPORT) Log.v(TAG, "remove transport");
             mAppWidgetContainer.removeWidget(getOrCreateTransportControl());
             mTransportControl = null;
@@ -1599,7 +1623,7 @@ public class KeyguardHostView extends KeyguardViewBase {
             mAppWidgetToShow = AppWidgetManager.INVALID_APPWIDGET_ID;
         }
         // if music playing, show transport
-        if (musicTransportState == TRANSPORT_VISIBLE && mTransportShouldBeVisible) {
+        if (musicTransportState == TRANSPORT_VISIBLE) {
             if (DEBUG) Log.d(TAG, "Music playing, show transport");
             return mAppWidgetContainer.getWidgetPageIndex(getOrCreateTransportControl());
         }
@@ -1767,10 +1791,17 @@ public class KeyguardHostView extends KeyguardViewBase {
         showNextSecurityScreenOrFinish(false);
     }
 
+    public void showCustomIntent(Intent intent) {
+        startActivity(intent);
+    }
+
     public void showAssistant() {
         final Intent intent = ((SearchManager) mContext.getSystemService(Context.SEARCH_SERVICE))
           .getAssistIntent(mContext, true, UserHandle.USER_CURRENT);
+        startActivity(intent);
+    }
 
+    private void startActivity(Intent intent) {
         if (intent == null) return;
 
         final ActivityOptions opts = ActivityOptions.makeCustomAnimation(mContext,
@@ -1782,4 +1813,5 @@ public class KeyguardHostView extends KeyguardViewBase {
         mActivityLauncher.launchActivityWithAnimation(
                 intent, false, opts.toBundle(), null, null);
     }
+
 }
