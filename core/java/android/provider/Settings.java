@@ -3970,18 +3970,6 @@ public final class Settings {
             Secure.WIFI_WATCHDOG_PING_TIMEOUT_MS;
 
         /**
-         * Sets if use seperate transparency of statusbar on lockscreen
-         * @hide
-         */
-        public static final String STATUS_BAR_LOCKSCREEN_ALPHA_USE = "status_bar_lockscreen_alpha_use";
-
-        /**
-         * Sets seperate transparency of statusbar on lockscreen, if used
-         * @hide
-         */
-        public static final String STATUS_BAR_LOCKSCREEN_ALPHA = "status_bar_lockscreen_alpha";
-
-        /**
          * Sets the portrait background of notification drawer
          * @hide
          */
