@@ -3156,7 +3156,7 @@ public class PhoneStatusBar extends BaseStatusBar {
         }
     }
 
-    private void recreateStatusBar(boolean recreateBackground) { 
+    private void recreateStatusBar() {
         mRecreating = true;
         mStatusBarContainer.removeAllViews();
 
@@ -3178,12 +3178,9 @@ public class PhoneStatusBar extends BaseStatusBar {
         mNotificationData.clear();
 
         makeStatusBarView();
-
-        if (mNavigationBarView != null) {
-	    // recreate and reposition navigationbar 
-            mNavigationBarView.recreateNavigationBar(recreateBackground);
-            repositionNavigationBar();
-	} 
+        repositionNavigationBar();
+        if (mNavigationBarView != null)
+            mNavigationBarView.updateResources();
 
         // recreate StatusBarIconViews.
         for (int i = 0; i < nIcons; i++) {
@@ -3229,11 +3226,10 @@ public class PhoneStatusBar extends BaseStatusBar {
             || uiInvertedMode != mCurrUiInvertedMode) {
             if (uiInvertedMode != mCurrUiInvertedMode) {
                 mCurrUiInvertedMode = uiInvertedMode;
-		recreateStatusBar(false); 
             } else {
                 mCurrentTheme = (CustomTheme) newTheme.clone();
-		recreateStatusBar(true); 
             } 
+            recreateStatusBar();
         } else {
 
             if (mClearButton instanceof TextView) {
