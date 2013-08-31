@@ -26,7 +26,6 @@ import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.hardware.input.InputManager;
 import android.os.SystemClock;
-import android.os.UserHandle; 
 import android.util.AttributeSet;
 import android.view.HapticFeedbackConstants;
 import android.view.InputDevice;

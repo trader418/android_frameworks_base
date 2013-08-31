@@ -1412,14 +1412,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         ContentResolver resolver = mContext.getContentResolver();
         boolean updateRotation = false, updateDisplayMetrics = false;
 
-	mExpandedStyle = Settings.System.getInt(resolver,
-                Settings.System.EXPANDED_DESKTOP_STYLE, 0);
-        mExpandedState = Settings.System.getInt(resolver,
-                Settings.System.EXPANDED_DESKTOP_STATE, 0);
-        mHideStatusBar = Settings.System.getInt(resolver,
-                Settings.System.HIDE_STATUSBAR, 0) == 1; 
+	mExpandedStyle = Settings.System.getInt(mContext.getContentResolver(),
+                                Settings.System.EXPANDED_DESKTOP_STYLE, 0);
+        mExpandedState = Settings.System.getInt(mContext.getContentResolver(),
+                                Settings.System.EXPANDED_DESKTOP_STATE, 0);
 
-	synchronized (mLock) {
+        synchronized (mLock) {
             mEndcallBehavior = Settings.System.getIntForUser(resolver,
                     Settings.System.END_BUTTON_BEHAVIOR,
                     Settings.System.END_BUTTON_BEHAVIOR_DEFAULT,
@@ -3923,10 +3921,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             if (DEBUG_LAYOUT) Log.i(TAG, "force=" + mForceStatusBar
                     + " forcefkg=" + mForceStatusBarFromKeyguard
                     + " top=" + mTopFullscreenOpaqueWindowState);
-            if (mForceStatusBar || (mForceStatusBarFromKeyguard
-                    && !mHideStatusBar
-                    && (mExpandedState == 0
-                    || mExpandedState == 1 && mExpandedStyle < 2))) { 
+            if (mForceStatusBar || mForceStatusBarFromKeyguard
+                    && !expandedDesktopHidesStatusBar()) {
                 if (DEBUG_LAYOUT) Log.v(TAG, "Showing status bar: forced");
                 if (mStatusBar.showLw(true)) changes |= FINISH_LAYOUT_REDO_LAYOUT;
             } else if (mTopFullscreenOpaqueWindowState != null) {
@@ -3942,8 +3938,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 // and mTopIsFullscreen is that that mTopIsFullscreen is set only if the window
                 // has the FLAG_FULLSCREEN set.  Not sure if there is another way that to be the
                 // case though.
-                if ((topIsFullscreen || mExpandedState == 1 && mExpandedStyle > 1 
-			|| mHideStatusBar) && expandedDesktopHidesStatusBar()) {    
+                mHideStatusBar = Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.HIDE_STATUSBAR, 0) == 1;
+                if ((topIsFullscreen) || (mExpandedState == 1 && (mExpandedStyle == 2 
+            		|| mExpandedStyle == 3)) || expandedDesktopHidesStatusBar() || (mHideStatusBar)) {   
                     if (DEBUG_LAYOUT) Log.v(TAG, "** HIDING status bar");
                     if (mStatusBar.hideLw(true)) {
                         changes |= FINISH_LAYOUT_REDO_LAYOUT;

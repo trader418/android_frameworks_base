@@ -25,7 +25,6 @@ import com.android.internal.widget.SizeAdaptiveLayout;
 import com.android.systemui.R;
 import com.android.systemui.SearchPanelView;
 import com.android.systemui.SystemUI;
-import com.android.systemui.statusbar.TransparencyManager; 
 import com.android.systemui.recent.RecentTasksLoader;
 import com.android.systemui.recent.RecentsActivity;
 import com.android.systemui.recent.TaskDescription;
@@ -135,7 +134,6 @@ public abstract class BaseStatusBar extends SystemUI implements
     protected CommandQueue mCommandQueue;
     protected IStatusBarService mBarService;
     protected H mHandler = createHandler();
-    public TransparencyManager mTransparencyManager; 
 
     // all notifications
     protected NotificationData mNotificationData = new NotificationData();
@@ -370,11 +368,7 @@ public abstract class BaseStatusBar extends SystemUI implements
         mHaloActive = Settings.System.getInt(mContext.getContentResolver(),
                 Settings.System.HALO_ACTIVE, 0) == 1;
 
-        if (mTransparencyManager == null) {
-            mTransparencyManager = new TransparencyManager(mContext);
-        }
-
-        createAndAddWindows(); 
+        createAndAddWindows();
 
         disable(switches[0]);
         setSystemUiVisibility(switches[1], 0xffffffff);
@@ -1673,6 +1667,7 @@ public abstract class BaseStatusBar extends SystemUI implements
     }
 
     // Pie Controls
+
     public void updatePieTriggerMask(int newMask) {
         if (mPieController != null) {
             mPieController.updatePieTriggerMask(newMask);
