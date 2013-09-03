@@ -4228,12 +4228,6 @@ public final class Settings {
          */
         public static final String STATUS_BAR_COLOR = "status_bar_color";
 
-        /**
-         * Is current activity launcher or not
-         * @hide
-         */
-        public static final String IS_HOME = "is_home";
-
 	/**
          * Navigation bar color
          * @hide
