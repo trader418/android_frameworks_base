@@ -439,9 +439,6 @@ public class PieController implements BaseStatusBar.NavigationBarCallback,
 
     public void attachTo(BaseStatusBar statusBar) {
         mStatusBar = statusBar;
-        if (mPieContainer != null) {
-            mPieContainer.attachStatusBar(statusBar);
-        }
     }
 
     public void attachTo(PieLayout container) {
