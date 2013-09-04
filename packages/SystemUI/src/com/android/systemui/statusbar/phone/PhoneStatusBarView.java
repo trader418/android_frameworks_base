@@ -259,7 +259,7 @@ public class PhoneStatusBarView extends PanelBar {
         mLastFullyOpenedPanel = null;
 
         // show up you pie controls
-        mBar.setupTriggers(false); 
+        mBar.setupTriggers(false, false); 
     }
 
     @Override
@@ -271,7 +271,7 @@ public class PhoneStatusBarView extends PanelBar {
         }
 
         // back off you pie controls!
-        mBar.setupTriggers(true); 
+        mBar.setupTriggers(true, false); 
 
         mFadingPanel = openPanel;
         mLastFullyOpenedPanel = openPanel;
