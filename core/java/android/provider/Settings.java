@@ -3378,7 +3378,15 @@ public final class Settings {
          *
          * @hide
          */
-        public static final String STATUSBAR_PEEK = "statusbar_peek";  
+        public static final String STATUSBAR_PEEK = "statusbar_peek";
+
+        /**
+         * Whether Status Bar is currently hidden or not for notification
+         * toggle notification shade
+         *
+         * @hide
+         */
+        public static final String TOGGLE_NOTIFICATION_SHADE = "toggle_notification_shade";  
 
         /**
          * Whether to use a separate delay for "slide to unlock" and security
