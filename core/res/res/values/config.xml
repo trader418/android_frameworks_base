@@ -1298,4 +1298,9 @@
     <!-- The list of components which should be automatically disabled. -->
     <string-array name="config_disabledComponents" translatable="false">
     </string-array>
+
+    <!-- Boolean to enable/disable SlimPIE
+        default is enabled -->
+    <bool name="config_slimPie">true</bool> 
+
 </resources>
