@@ -177,7 +177,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private static final int KEY_ACTION_SEARCH = 3;
     private static final int KEY_ACTION_VOICE_SEARCH = 4;
     private static final int KEY_ACTION_IN_APP_SEARCH = 5;
-
+    
     // Masks for checking presence of hardware keys.
     // Must match values in core/res/res/values/config.xml
     private static final int KEY_MASK_HOME = 0x01;
@@ -343,8 +343,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
     // Behavior expanded desktop mode
     int mExpandedState;
-    int mExpandedStyle;  
+    int mExpandedStyle; 
 
+    boolean mHideStatusBar;
+    
     private static final class PointerLocationInputEventReceiver extends InputEventReceiver {
         private final PointerLocationView mView;
 
@@ -443,10 +445,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     boolean mHideLockScreen;
     boolean mForcingShowNavBar;
     int mForcingShowNavBarLayer;
-
-    int mExpandedDesktopStyle = -1;
-
-    boolean mHideStatusBar; 
 
     // States of keyguard dismiss.
     private static final int DISMISS_KEYGUARD_NONE = 0; // Keyguard not being dismissed.
@@ -669,9 +667,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 	    resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.HIDE_STATUSBAR), false, this,
 		    UserHandle.USER_ALL);
-	    resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.TOGGLE_NOTIFICATION_SHADE), false, this,
-		    UserHandle.USER_ALL); 
 	    resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NAVIGATION_BAR_SHOW), false, this, 
 	            UserHandle.USER_ALL);
@@ -1346,9 +1341,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 com.android.internal.R.dimen.status_bar_height);
 
         // SystemUI (status bar) layout policy
-        int shortSizeDp = shortSize * DisplayMetrics.DENSITY_DEFAULT / density;
+        mShortSizeDp = shortSize * DisplayMetrics.DENSITY_DEFAULT / density;
 
-        if (shortSizeDp < 600) {
+        if (mShortSizeDp < 600) {
             // 0-599dp: "phone" UI with a separate status & navigation bar
             mHasSystemNavBar = false;
             if (Settings.System.getInt(mContext.getContentResolver(),
@@ -1359,13 +1354,18 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             } 
 	    Settings.System.putInt(mContext.getContentResolver(),
                     Settings.System.TABLET_UI, 0); 
-        } else if (shortSizeDp < 720) {
+        } else if (mShortSizeDp < 720) {
             // 600+dp: "phone" UI with modifications for larger screens
             mHasSystemNavBar = false;
             mNavigationBarCanMove = false;
 	    Settings.System.putInt(mContext.getContentResolver(),
                     Settings.System.TABLET_UI, 2); 
-        }
+	} else {
+            mHasSystemNavBar = false;
+            mNavigationBarCanMove = false;
+            Settings.System.putInt(mContext.getContentResolver(),
+                    Settings.System.TABLET_UI, 1);
+	} 
 
         if (!mHasSystemNavBar) {   
             // Allow a system property to override this. Used by the emulator.
@@ -1386,7 +1386,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             int longSizeDp = longSize * DisplayMetrics.DENSITY_DEFAULT / density;
             int barHeightDp = mNavigationBarHeightForRotation[mLandscapeRotation]
                     * DisplayMetrics.DENSITY_DEFAULT / density;
-            int aspect = ((shortSizeDp-barHeightDp) * 16) / longSizeDp;
+            int aspect = ((mShortSizeDp-barHeightDp) * 16) / longSizeDp;
             // We have computed the aspect ratio with the bar height taken
             // out to be 16:aspect.  If this is less than 9, then hiding
             // the navigation bar will provide more useful space for wide
@@ -1428,12 +1428,16 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         ContentResolver resolver = mContext.getContentResolver();
         boolean updateRotation = false, updateDisplayMetrics = false;
 
-	mExpandedStyle = Settings.System.getInt(mContext.getContentResolver(),
-                                Settings.System.EXPANDED_DESKTOP_STYLE, 0);
-        mExpandedState = Settings.System.getInt(mContext.getContentResolver(),
-                                Settings.System.EXPANDED_DESKTOP_STATE, 0);
+	mExpandedStyle = Settings.System.getInt(resolver,
+                Settings.System.EXPANDED_DESKTOP_STYLE, 0);
+        mExpandedState = Settings.System.getInt(resolver,
+                Settings.System.EXPANDED_DESKTOP_STATE, 0); 
+        //mHideStatusBar = Settings.System.getInt(resolver,
+        //        Settings.System.HIDE_STATUSBAR, 0) == 1;
+        //mToggleNotificationAndQSShade = Settings.System.getInt(resolver,
+        //        Settings.System.TOGGLE_NOTIFICATION_SHADE, 0) == 1;
 
-        synchronized (mLock) {
+	synchronized (mLock) {
             mEndcallBehavior = Settings.System.getIntForUser(resolver,
                     Settings.System.END_BUTTON_BEHAVIOR,
                     Settings.System.END_BUTTON_BEHAVIOR_DEFAULT,
@@ -1479,12 +1483,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
 	    final int showByDefault = mContext.getResources().getBoolean(
                     com.android.internal.R.bool.config_showNavigationBar) ? 1 : 0;
-            mHasNavigationBar = Settings.System.getInt(resolver, 
+            mHasNavigationBar = Settings.System.getInt(resolver,
                     Settings.System.NAVIGATION_BAR_SHOW, showByDefault) == 1;
 
-      	    if ((mExpandedState == 1 &&
+            if ((mExpandedState == 1 &&
                 (mExpandedStyle == 1 || mExpandedStyle == 3))
-                || !mHasNavigationBar) { 
+                || !mHasNavigationBar) {
                 // Set the navigation bar's dimensions to 0 in expanded desktop mode
                 mNavigationBarWidthForRotation[mPortraitRotation]
                         = mNavigationBarWidthForRotation[mUpsideDownRotation]
@@ -1528,19 +1532,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 updateDisplayMetrics = true;
             }     
 
-	    int expandedDesktopStyle = Settings.System.getIntForUser(resolver,
-                    Settings.System.EXPANDED_DESKTOP_STYLE, 0, UserHandle.USER_CURRENT);
-            if (Settings.System.getIntForUser(resolver,
-                        Settings.System.EXPANDED_DESKTOP_STATE, 0, UserHandle.USER_CURRENT) == 0) {
-                expandedDesktopStyle = 0;
-            }
-
-            if (expandedDesktopStyle != mExpandedDesktopStyle) {
-                mExpandedDesktopStyle = expandedDesktopStyle;
-                updateDisplayMetrics = true;
-            }
-
-            // Configure rotation lock.
+	    // Configure rotation lock.
             int userRotation = Settings.System.getIntForUser(resolver,
                     Settings.System.USER_ROTATION, Surface.ROTATION_0,
                     UserHandle.USER_CURRENT);
@@ -1559,8 +1551,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 updateOrientationListenerLp();
             }
 
-            mUserRotationAngles = Settings.System.getIntForUser(resolver,
-                    Settings.System.ACCELEROMETER_ROTATION_ANGLES, -1, UserHandle.USER_CURRENT);
+            mUserRotationAngles = Settings.System.getInt(resolver,
+                    Settings.System.ACCELEROMETER_ROTATION_ANGLES, -1);
 
             if (mSystemReady) {
                 int pointerLocation = Settings.System.getIntForUser(resolver,
@@ -1571,8 +1563,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                             MSG_ENABLE_POINTER_LOCATION : MSG_DISABLE_POINTER_LOCATION);
                 }
             }
-
-            // Use screen off timeout setting as the timeout for the lockscreen
+            // use screen off timeout setting as the timeout for the lockscreen
             mLockScreenTimeout = Settings.System.getIntForUser(resolver,
                     Settings.System.SCREEN_OFF_TIMEOUT, 0, UserHandle.USER_CURRENT);
             String imId = Settings.Secure.getStringForUser(resolver,
@@ -1583,16 +1574,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 updateRotation = true;
             }
         }
-
         if (updateRotation) {
             updateRotation(true);
         } else if (updateDisplayMetrics) {
             updateDisplayMetrics();
-        }
-
-	if(mDisplay != null) {
-            setInitialDisplaySize(mDisplay, mUnrestrictedScreenWidth, mUnrestrictedScreenHeight, density);
-        } 
+	}  
     }
 
     private void enablePointerLocation() {
@@ -1941,7 +1927,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     }
 
     public int getNonDecorDisplayHeight(int fullWidth, int fullHeight, int rotation) {
-        if (mHasSystemNavBar && !expandedDesktopHidesNavigationBar()) {
+        if (mHasSystemNavBar /*&& !expandedDesktopHidesNavigationBar()*/) {
             // For the system navigation bar, we always place it at the bottom.
             return fullHeight - mNavigationBarHeightForRotation[rotation];
         }
@@ -3085,7 +3071,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         if ((fl & (FLAG_LAYOUT_IN_SCREEN | FLAG_LAYOUT_INSET_DECOR))
                 == (FLAG_LAYOUT_IN_SCREEN | FLAG_LAYOUT_INSET_DECOR)) {
             int availRight, availBottom;
-            if (shouldHideNavigationBarLw(systemUiVisibility)) {
+            if (mCanHideNavigationBar &&
+                    (systemUiVisibility & View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION) != 0) {
                 availRight = mUnrestrictedScreenLeft + mUnrestrictedScreenWidth;
                 availBottom = mUnrestrictedScreenTop + mUnrestrictedScreenHeight;
             } else {
@@ -3217,16 +3204,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             // For purposes of positioning and showing the nav bar, if we have
             // decided that it can't be hidden (because of the screen aspect ratio),
             // then take that into account.
-            if (expandedDesktopHidesNavigationBar()
-                    && (mLastSystemUiFlags & View.SYSTEM_UI_FLAG_SHOW_NAVIGATION_IN_EXPANDED_DESKTOP) == 0) {
-                navVisible = false;
-                navWidth = 0;
-                navHeight = 0;
-            } else if (!mCanHideNavigationBar) {
-                navVisible = true;
-            }
-
-            if (mNavigationBar != null) {
+            navVisible |= !mCanHideNavigationBar;
+	    if (mNavigationBar != null) {
                 // Force the navigation bar to its appropriate place and
                 // size.  We need to do this directly, instead of relying on
                 // it to bubble up from the nav bar, because this needs to
@@ -3315,12 +3294,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 // Let the status bar determine its size.
                 mStatusBar.computeFrameLw(pf, df, vf, vf, vf);
 
-                // For layout, the status bar is always at the top with our fixed height
-                // (except if it's hidden by expanded desktop, in which case we know it's
-                // never shown)
-                if (!expandedDesktopHidesStatusBar()) {
-                    mStableTop = mUnrestrictedScreenTop + mStatusBarHeight;
-                }
+                // For layout, the status bar is always at the top with our fixed height.
+                mStableTop = mUnrestrictedScreenTop + mStatusBarHeight;
 
                 // If the status bar is hidden, we don't want to cause
                 // windows behind it to scroll.
@@ -3541,7 +3516,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                         pf.right = df.right = of.right = mOverscanScreenLeft + mOverscanScreenWidth;
                         pf.bottom = df.bottom = of.bottom = mOverscanScreenTop
                                 + mOverscanScreenHeight;
-                    } else if (shouldHideNavigationBarLw(sysUiFl)
+                    } else if (mCanHideNavigationBar
+			    && (sysUiFl & View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION) != 0
                             && attrs.type >= WindowManager.LayoutParams.FIRST_APPLICATION_WINDOW
                             && attrs.type <= WindowManager.LayoutParams.LAST_SUB_WINDOW) {
                         // Asking for layout as if the nav bar is hidden, lets the
@@ -3683,7 +3659,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                             = mOverscanScreenLeft + mOverscanScreenWidth;
                     pf.bottom = df.bottom = of.bottom = cf.bottom
                             = mOverscanScreenTop + mOverscanScreenHeight;
-                } else if (shouldHideNavigationBarLw(sysUiFl)
+                } else if (mCanHideNavigationBar
+			&& (sysUiFl & View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION) != 0
                         && attrs.type >= WindowManager.LayoutParams.FIRST_APPLICATION_WINDOW
                         && attrs.type <= WindowManager.LayoutParams.LAST_SUB_WINDOW) {
                     // Asking for layout as if the nav bar is hidden, lets the
@@ -3791,30 +3768,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             setLastInputMethodWindowLw(null, null);
             offsetInputMethodWindowLw(win);
         }
-    }
-
-    private boolean expandedDesktopHidesStatusBar() {
-        return mExpandedDesktopStyle == 2;
-    }
-
-    private boolean expandedDesktopHidesNavigationBar() {
-        return mExpandedDesktopStyle != 0;
-    }
-
-    private boolean shouldHideNavigationBarLw(int systemUiVisibility) {
-        if (expandedDesktopHidesNavigationBar()) {
-            if ((systemUiVisibility & View.SYSTEM_UI_FLAG_SHOW_NAVIGATION_IN_EXPANDED_DESKTOP) == 0) {
-                return true;
-            }
-        }
-
-        if (mCanHideNavigationBar) {
-            if ((systemUiVisibility & View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION) != 0) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private void offsetInputMethodWindowLw(WindowState win) {
@@ -3940,8 +3893,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             if (DEBUG_LAYOUT) Log.i(TAG, "force=" + mForceStatusBar
                     + " forcefkg=" + mForceStatusBarFromKeyguard
                     + " top=" + mTopFullscreenOpaqueWindowState);
-            if (mForceStatusBar || mForceStatusBarFromKeyguard
-                    && !expandedDesktopHidesStatusBar()) {
+            if (mForceStatusBar || (mForceStatusBarFromKeyguard
+                    && !mHideStatusBar
+                    && (mExpandedState == 0
+                    || mExpandedState == 1 && mExpandedStyle < 2))) { 
                 if (DEBUG_LAYOUT) Log.v(TAG, "Showing status bar: forced");
                 if (mStatusBar.showLw(true)) changes |= FINISH_LAYOUT_REDO_LAYOUT;
             } else if (mTopFullscreenOpaqueWindowState != null) {
@@ -3957,15 +3912,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 // and mTopIsFullscreen is that that mTopIsFullscreen is set only if the window
                 // has the FLAG_FULLSCREEN set.  Not sure if there is another way that to be the
                 // case though.
-                mHideStatusBar = Settings.System.getInt(mContext.getContentResolver(),
+		mHideStatusBar = Settings.System.getInt(mContext.getContentResolver(),
                         Settings.System.HIDE_STATUSBAR, 0) == 1;
-
-		boolean toggleNotificationShade = Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.TOGGLE_NOTIFICATION_SHADE, 0) == 1;
-                if ((topIsFullscreen && !toggleNotificationShade)
-                        || (mExpandedState == 1 &&
-                        (mExpandedStyle == 2 || mExpandedStyle == 3) && !toggleNotificationShade)
-                        || (mHideStatusBar && !toggleNotificationShade) || expandedDesktopHidesStatusBar()) { 
+                 if (topIsFullscreen || (mExpandedState == 1 &&
+                        (mExpandedStyle == 2 || mExpandedStyle == 3)) || mHideStatusBar) {    
                     if (DEBUG_LAYOUT) Log.v(TAG, "** HIDING status bar");
                     if (mStatusBar.hideLw(true)) {
                         changes |= FINISH_LAYOUT_REDO_LAYOUT;

@@ -3402,14 +3402,15 @@ public final class Settings {
         /** @hide */
         public static final int STATUS_BAR_COLLAPSE_IF_NO_CLEARABLE = 2;
 
-         /**
-         * Expanded desktop on/off state
-         * @hide
+        /**
+         * Whether Expanded desktop is currently running or not
+	 * @hide
          */
         public static final String EXPANDED_DESKTOP_STATE = "expanded_desktop_state";
 
         /**
-         * Expanded desktop style (with status bar or without status bar)
+         * Expanded desktop style
+         * 0 = none, 1 = hide only navbar, 2 = hide only statusbar, 3 = hide both
          * @hide
          */
         public static final String EXPANDED_DESKTOP_STYLE = "expanded_desktop_style";
@@ -3452,14 +3453,6 @@ public final class Settings {
          * @hide
          */
         public static final String STATUSBAR_PEEK = "statusbar_peek";
-
-        /**
-         * Whether Status Bar is currently hidden or not for notification
-         * toggle notification shade
-         *
-         * @hide
-         */
-        public static final String TOGGLE_NOTIFICATION_SHADE = "toggle_notification_shade";  
 
         /**
          * Whether to use a separate delay for "slide to unlock" and security
