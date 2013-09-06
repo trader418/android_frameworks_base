@@ -523,7 +523,6 @@ public abstract class BaseStatusBar extends SystemUI implements
 
         // this calls attachPie() implicitly
         mSettingsObserver.onChange(true);
-
         mSettingsObserver.observe();
 
         // Listen for HALO enabled switch
@@ -943,10 +942,10 @@ public abstract class BaseStatusBar extends SystemUI implements
                             + thumbBgPadding + thumbLeftMargin);
                     y = (int) (dm.heightPixels
                             - res.getDimensionPixelSize(R.dimen.status_bar_recents_thumbnail_height) - thumbBgPadding);
-                    if (mLayoutDirection == View.LAYOUT_DIRECTION_RTL) {
-                        x = dm.widthPixels - x - res
-                                .getDimensionPixelSize(R.dimen.status_bar_recents_thumbnail_width);
-                    }
+                    //if (mLayoutDirection == View.LAYOUT_DIRECTION_RTL) {
+                    //    x = dm.widthPixels - x - res
+                    //            .getDimensionPixelSize(R.dimen.status_bar_recents_thumbnail_width);
+                    //}
 
                 } else { // if (config.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                     float thumbTopMargin = res
@@ -1811,14 +1810,6 @@ public abstract class BaseStatusBar extends SystemUI implements
 
     // Pie Controls
 
-    //@Override
-    //protected void onConfigurationChanged(Configuration newConfig) {
-    //    super.onConfigurationChanged(newConfig);
-
-    //    if (DEBUG) Slog.d(TAG, "Configuration changed! Update pie triggers");
-    //    attachPie();
-    //}
-
     private final class PieSettingsObserver extends ContentObserver {
         PieSettingsObserver(Handler handler) {
             super(handler);
@@ -1944,11 +1935,11 @@ public abstract class BaseStatusBar extends SystemUI implements
         }
     }
 
-    public void disableTriggers(boolean disableTriggers) {
-        if (isPieEnabled()) { 
+    public void disableTriggers( boolean disableTriggers) {
+        if (mPieContainer != null) {
             mDisableTriggers = disableTriggers;
             setupTriggers(false);
-        } 
+        }
     }
 
     public void recreatePie() {
@@ -2076,7 +2067,7 @@ public abstract class BaseStatusBar extends SystemUI implements
         mPieTriggerMask = newMask;
 
 	// pass actual trigger mask and slots to the attached container
-        mPieContainer.setSnapPoints(mPieTriggerMask & ~mPieTriggerSlots); 
+        mPieContainer.setSnapPoints(mPieTriggerMask & ~mPieTriggerSlots);
 
         // first we check, if it would make a change
         if ((mPieTriggerSlots & mPieTriggerMask) != oldState
