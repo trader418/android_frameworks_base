@@ -102,6 +102,7 @@ public class KeyguardViewManager {
         mViewManager = viewManager;
         mViewMediatorCallback = callback;
         mLockPatternUtils = lockPatternUtils;
+
     }
 
     /**
@@ -317,7 +318,6 @@ public class KeyguardViewManager {
 
     private void maybeCreateKeyguardLocked(boolean enableScreenRotation, boolean force,
             Bundle options) {
-
         int transparentMode = Settings.System.getIntForUser(mContext.getContentResolver(),
                   Settings.System.LOCKSCREEN_BACKGROUND_VALUE, 3, UserHandle.USER_CURRENT);
 
@@ -328,9 +328,10 @@ public class KeyguardViewManager {
         if (mKeyguardHost == null) {
             if (DEBUG) Log.d(TAG, "keyguard host is null, creating it...");
 
-            mKeyguardHost = new ViewManagerHost(mContext);
+	    mKeyguardHost = new ViewManagerHost(mContext);
+
             updateWindowLayoutParams(transparentMode);
-            mViewManager.addView(mKeyguardHost, mWindowLayoutParams);
+            mViewManager.addView(mKeyguardHost, mWindowLayoutParams); 
         }
 
         if (force || mKeyguardView == null) {
@@ -345,6 +346,11 @@ public class KeyguardViewManager {
         }
 
         mViewManager.updateViewLayout(mKeyguardHost, mWindowLayoutParams);
+
+	if (mTransparentMode != transparentMode) {
+            updateWindowLayoutParams(transparentMode);
+            mTransparentMode = transparentMode;
+        } 
 
         mKeyguardHost.restoreHierarchyState(mStateContainer);
     }
@@ -425,7 +431,7 @@ public class KeyguardViewManager {
 
     public void updateUserActivityTimeout() {
         updateUserActivityTimeoutInWindowLayoutParams();
-        mViewManager.updateViewLayout(mKeyguardHost, mWindowLayoutParams);
+	mViewManager.updateViewLayout(mKeyguardHost, mWindowLayoutParams);
     }
 
     private void updateUserActivityTimeoutInWindowLayoutParams() {
@@ -610,27 +616,5 @@ public class KeyguardViewManager {
             mKeyguardView.showCustomIntent(intent);
         }
     } 
-
-    /**
-     * observe transparency settings for wallpaper
-     */
-
-    class SettingsObserver extends ContentObserver {
-            SettingsObserver(Handler handler) {
-              super(handler);
-            }
-
-            void observe() {
-                 ContentResolver resolver = mContext.getContentResolver();
-                      resolver.registerContentObserver(Settings.System.getUriFor(
-                      Settings.System.LOCKSCREEN_BACKGROUND_VALUE), false, this);
-            }
-
-            @Override
-            public void onChange(boolean selfChange, Uri uri) {
-                if (mKeyguardHost != null) mViewManager.removeView(mKeyguardHost);
-                mKeyguardHost = null;
-            }
-    }
 
 }
