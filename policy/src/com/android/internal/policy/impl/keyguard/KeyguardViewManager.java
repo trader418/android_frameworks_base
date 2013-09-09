@@ -609,6 +609,28 @@ public class KeyguardViewManager {
         if (mKeyguardView != null) {
             mKeyguardView.showCustomIntent(intent);
         }
+    } 
+
+    /**
+     * observe transparency settings for wallpaper
+     */
+
+    class SettingsObserver extends ContentObserver {
+            SettingsObserver(Handler handler) {
+              super(handler);
+            }
+
+            void observe() {
+                 ContentResolver resolver = mContext.getContentResolver();
+                      resolver.registerContentObserver(Settings.System.getUriFor(
+                      Settings.System.LOCKSCREEN_BACKGROUND_VALUE), false, this);
+            }
+
+            @Override
+            public void onChange(boolean selfChange, Uri uri) {
+                if (mKeyguardHost != null) mViewManager.removeView(mKeyguardHost);
+                mKeyguardHost = null;
+            }
     }
 
 }
