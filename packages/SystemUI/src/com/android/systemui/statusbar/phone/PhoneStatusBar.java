@@ -929,7 +929,9 @@ public class PhoneStatusBar extends BaseStatusBar {
 
         mVelocityTracker = VelocityTracker.obtain();
 
-        return mStatusBarView;
+	mTransparencyManager.setStatusbar(mStatusBarView);
+	
+	return mStatusBarView;
     }
 
     @Override
@@ -1147,6 +1149,8 @@ public class PhoneStatusBar extends BaseStatusBar {
 
         prepareNavigationBarView();
         mWindowManager.addView(mNavigationBarView, getNavigationBarLayoutParams());
+	mTransparencyManager.setNavbar(mNavigationBarView);
+        mTransparencyManager.update(); 
     }
 
     private void repositionNavigationBar() {
@@ -1791,7 +1795,7 @@ public class PhoneStatusBar extends BaseStatusBar {
                 haltTicker();
             }
         }
-        mStatusBarView.updateBackgroundAlpha();
+	mTransparencyManager.update();  
     }
 
     @Override
@@ -2674,7 +2678,7 @@ public class PhoneStatusBar extends BaseStatusBar {
 
     @Override
     public void topAppWindowChanged(boolean showMenu) {
-        mStatusBarView.updateBackgroundAlpha();
+	mTransparencyManager.update(); 
         if (DEBUG) {
             Slog.d(TAG, (showMenu?"showing":"hiding") + " the MENU button");
         }
@@ -3046,6 +3050,7 @@ public class PhoneStatusBar extends BaseStatusBar {
                 updateResources();
                 repositionNavigationBar();
                 updateExpandedViewPos(EXPANDED_LEAVE_ALONE);
+		updateSwapXY();
                 updateShowSearchHoldoff();
 		try {
                     // position app sidebar on left if in landscape orientation and device has a navbar
@@ -3071,6 +3076,20 @@ public class PhoneStatusBar extends BaseStatusBar {
             }
         }
     };
+
+    private void updateSwapXY() {
+        if (mNavigationBarView != null
+            && mNavigationBarView.mDelegateHelper != null) {
+                if (Settings.System.getIntForUser(mContext.getContentResolver(),
+                            Settings.System.NAVIGATION_BAR_CAN_MOVE, 1, UserHandle.USER_CURRENT) == 1) {
+                    // if we are in landscape mode and NavBar can move swap the XY coordinates for NaVRing Swipe
+                    mNavigationBarView.mDelegateHelper.setSwapXY((
+                            mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE));
+                } else {
+                    mNavigationBarView.mDelegateHelper.setSwapXY(false);
+                }
+        }
+    }
 
     @Override
     public void userSwitched(int newUserId) {
