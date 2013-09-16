@@ -2260,13 +2260,6 @@ public class PhoneStatusBar extends BaseStatusBar {
                 @Override
                 public void run() {
                 updateCarrierLabelVisibility(false);
-                }
-            }, FLIP_DURATION - 150);
-
-            if (mNotificationShortcutsToggle) {
-            mNotificationPanel.postDelayed(new Runnable() {
-                @Override
-                public void run() {
                 updateNotificationShortcutsVisibility(false);
                 }
             }, FLIP_DURATION - 150);
