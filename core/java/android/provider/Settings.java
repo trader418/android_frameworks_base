@@ -2950,13 +2950,6 @@ public final class Settings {
         public static final String QS_QUICK_PULLDOWN = "qs_quick_pulldown";
 
         /**
-         * Quick Settings Number of Columns
-         *
-         * @hide
-         */
-        public static final String QUICK_SETTINGS_COLUMNS = "quick_settings_columns";
-
-        /**
          * Quick Settings Collapse Pane
          *
          * @hide
