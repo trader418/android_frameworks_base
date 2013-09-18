@@ -3318,7 +3318,8 @@ public class PhoneStatusBar extends BaseStatusBar {
         }
 
         // Update the QuickSettings container
-        if (mQS != null) mQS.updateResources();
+        //if (mQS != null) mQS.updateResources();
+	if (mSettingsContainer != null) mSettingsContainer.updateResources();
 
     }
 
@@ -3525,10 +3526,13 @@ public class PhoneStatusBar extends BaseStatusBar {
                     inflateRibbon();
                     mRibbonView.setVisibility(View.VISIBLE);
             } else if (mSettingsContainer != null) {
-		    mQS.setupQuickSettings();
-                    if (mQuickAccessLayoutLinked && mRibbonQS != null) {
-                    mRibbonQS.setupQuickSettings();
-                }
+		    // Refresh the container
+                    mSettingsContainer.removeAllViews();
+                    mQS.setupQuickSettings();
+                    mSettingsContainer.updateResources();
+		    if (mQuickAccessLayoutLinked && mRibbonQS != null) {
+                        mRibbonQS.setupQuickSettings();
+                } 
             } 
 
 	    String navBarConfig = Settings.System.getStringForUser(mContext.getContentResolver(),
@@ -3601,6 +3605,22 @@ public class PhoneStatusBar extends BaseStatusBar {
             cr.registerContentObserver(
                     Settings.System.getUriFor(Settings.System.QUICK_SETTINGS_RIBBON_TILES),
                     false, this, UserHandle.USER_ALL);
+
+	    cr.registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.QUICK_TILES_PER_ROW),
+                    false, this);
+
+	    cr.registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.QUICK_TILES_PER_ROW_DUPLICATE_LANDSCAPE),
+                    false, this);
+
+	    cr.registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.QUICK_TILES_BG_COLOR),
+                    false, this);
+
+            cr.registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.QUICK_TILES_BG_PRESSED_COLOR),
+                    false, this);       
         }
     }
 
