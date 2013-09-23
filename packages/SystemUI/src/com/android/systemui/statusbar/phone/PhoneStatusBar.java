@@ -1457,6 +1457,9 @@ public class PhoneStatusBar extends BaseStatusBar {
             mPile.removeView(remove);
         }
 
+        //set alpha for notification pile before it is added
+        setNotificationAlphaHelper();
+
         for (int i=0; i<toShow.size(); i++) {
             View v = toShow.get(i);
             if (v.getParent() == null) {
@@ -3542,6 +3545,7 @@ public class PhoneStatusBar extends BaseStatusBar {
             }  
  
 	    setNotificationWallpaperHelper();
+            setNotificationAlphaHelper();
 
         }
 
@@ -3631,6 +3635,20 @@ public class PhoneStatusBar extends BaseStatusBar {
             }
             background.setAlpha((int) ((1-wallpaperAlpha) * 255));
         }
+    }
+
+    private void setNotificationAlphaHelper() { 
+        float notifAlpha = Settings.System.getFloat(mContext.getContentResolver(), Settings.System.NOTIF_ALPHA, 0.0f);
+        if (mPile != null) {
+            int N = mNotificationData.size();
+            for (int i=0; i<N; i++) {
+              Entry ent = mNotificationData.get(N-i-1);
+              View expanded = ent.expanded;
+              if (expanded !=null && expanded.getBackground()!=null) expanded.getBackground().setAlpha((int) ((1-notifAlpha) * 255));
+              View large = ent.getLargeView();
+              if (large != null && large.getBackground()!=null) large.getBackground().setAlpha((int) ((1-notifAlpha) * 255));
+            }
+        } 
     }
   
 }
