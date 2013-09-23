@@ -633,16 +633,7 @@ public class PhoneStatusBar extends BaseStatusBar {
 		addNavigationBarCallback(mNavigationBarView);  
         }
 
-        if (mRecreating) {
-            //if (mAppSidebar != null)
-            //    mWindowManager.removeView(mAppSidebar);
-	    removeSidebarView();
-        //mAppSidebar = (AppSidebar)View.inflate(context, R.layout.app_sidebar, null);
-        //mWindowManager.addView(mAppSidebar, getAppSidebarLayoutParams(mSidebarPosition));
-        } else {
-            addActiveDisplayView();
-        }
-
+        addActiveDisplayView();
         addSidebarView();
 
         // figure out which pixel-format to use for the status bar.
