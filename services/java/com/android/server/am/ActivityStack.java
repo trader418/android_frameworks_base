@@ -29,6 +29,7 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityOptions;
 import android.app.AppGlobals;
+import android.app.AppOpsManager;
 import android.app.IActivityManager;
 import android.app.IThumbnailRetriever;
 import android.app.IApplicationThread;
@@ -68,6 +69,7 @@ import android.util.EventLog;
 import android.util.Log;
 import android.util.Slog;
 import android.view.Display;
+
 import com.android.internal.app.ActivityTrigger;
 
 import java.io.IOException;
@@ -1795,7 +1797,7 @@ final class ActivityStack {
                 next.app.pendingUiClean = true;
                 next.app.thread.scheduleResumeActivity(next.appToken,
                         mService.isNextTransitionForward());
-
+                
                 checkReadyForSleepLocked();
 
             } catch (Exception e) {
@@ -1865,14 +1867,8 @@ final class ActivityStack {
             return;
         }
 
-        boolean privacy = false;
-
-        try {
-            privacy = AppGlobals.getPackageManager().getPrivacyGuardSetting(
-                    next.packageName, next.userId);
-        } catch (RemoteException e) {
-            // nothing
-        }
+        boolean privacy = mService.mAppOpsService.getPrivacyGuardSettingForPackage(
+                next.app.uid, next.packageName);
 
         if (mPrivacyGuardPackageName != null && !privacy) {
             Message msg = mService.mHandler.obtainMessage(
