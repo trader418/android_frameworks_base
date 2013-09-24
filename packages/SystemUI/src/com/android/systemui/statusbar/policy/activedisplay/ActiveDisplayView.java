@@ -536,7 +536,7 @@ public class ActiveDisplayView extends FrameLayout {
             if (mNotification != null && mNotification.isClearable()) {
                 storedDraw.add(new TargetDrawable(res, res.getDrawable(R.drawable.ic_ad_dismiss_notification)));
             } else {
-                storedDraw.add(new TargetDrawable(res, null));
+                storedDraw.add(new TargetDrawable(res, res.getDrawable(R.drawable.ic_qs_power)));
             }
         }
         storedDraw.add(new TargetDrawable(res, null));
@@ -648,17 +648,19 @@ public class ActiveDisplayView extends FrameLayout {
     }
 
     private void handleDismissNotification() {
-        try {
-            mNM.cancelNotificationFromListener(mNotificationListener,
-                    mNotification.getPackageName(), mNotification.getTag(),
-                    mNotification.getId());
-        } catch (RemoteException e) {
-        }
-        mNotification = getNextAvailableNotification();
-        if (mNotification != null) {
-            setActiveNotification(mNotification, true);
-            userActivity();
-            return;
+        if (mNotification != null && mNotification.isClearable()) {
+           try {
+                mNM.cancelNotificationFromListener(mNotificationListener,
+                        mNotification.getPackageName(), mNotification.getTag(),
+                        mNotification.getId());
+            } catch (RemoteException e) {
+            }
+            mNotification = getNextAvailableNotification();
+            if (mNotification != null) {
+                setActiveNotification(mNotification, true);
+                userActivity();
+                return;
+            }
         }
 
         // no other notifications to display so turn screen off
