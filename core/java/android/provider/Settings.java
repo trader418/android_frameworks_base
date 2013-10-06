@@ -3210,6 +3210,12 @@ public final class Settings {
          */
         public static final String APP_SIDEBAR_POSITION = "app_sidebar_position";
 
+       /**
+        * Show summary of traffic.
+        * @hide
+        */
+        public static final String STATUS_BAR_TRAFFIC_SUMMARY = "status_bar_traffic_summary";
+
         /**
          * Width of the appbar trigger
          *

@@ -28,9 +28,7 @@ public class Traffic extends TextView {
     boolean trafficMeterEnable;
 
     boolean trafficMeterHide;
-
-    //Handler mHandler;
-
+    int trafficMeterSummaryTime;
     long totalRxBytes;
 
     long lastUpdateTime;
@@ -62,6 +60,8 @@ public class Traffic extends TextView {
                     .getUriFor(Settings.System.STATUS_BAR_TRAFFIC_HIDE), false, this);
             resolver.registerContentObserver(Settings.System
                     .getUriFor(Settings.System.STATUS_BAR_TRAFFIC_COLOR), false, this);
+            resolver.registerContentObserver(Settings.System
+                    .getUriFor(Settings.System.STATUS_BAR_TRAFFIC_SUMMARY), false, this);
 
             updateSettings();
         }
@@ -238,16 +238,14 @@ public class Traffic extends TextView {
             if (trafficMeterHide && newBytes == 0) {
                 long trafficBurstBytes = currentRxBytes - trafficBurstStartBytes;
 
-                if (trafficBurstBytes != 0) {
+                if (trafficBurstBytes != 0 && trafficMeterSummaryTime != 0) {
                     setText(formatTraffic(trafficBurstBytes, false));
 
                     Log.i(TAG,
                             "Traffic burst ended: " + trafficBurstBytes + "B in "
                                     + (SystemClock.elapsedRealtime() - trafficBurstStartTime)
                                     / 1000 + "s");
-
-                    keepOnUntil = SystemClock.elapsedRealtime() + 3000;
-
+                    keepOnUntil = SystemClock.elapsedRealtime() + trafficMeterSummaryTime;
                     trafficBurstStartTime = Long.MIN_VALUE;
                     trafficBurstStartBytes = currentRxBytes;
                 }
@@ -290,6 +288,8 @@ public class Traffic extends TextView {
                 Settings.System.STATUS_BAR_TRAFFIC_ENABLE, 0) == 1);
         trafficMeterHide = (Settings.System.getInt(resolver,
                 Settings.System.STATUS_BAR_TRAFFIC_HIDE, 1) == 1);
+        trafficMeterSummaryTime = Settings.System.getInt(resolver,
+                Settings.System.STATUS_BAR_TRAFFIC_SUMMARY, 3000);
         int defaultColor = Settings.System.getInt(resolver,
                 Settings.System.STATUS_BAR_TRAFFIC_COLOR, 0xFF33b5e5);
 
