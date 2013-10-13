@@ -945,7 +945,6 @@ public final class Settings {
             MOVED_TO_SECURE.add(Secure.LOCK_SHOW_ERROR_PATH);
             MOVED_TO_SECURE.add(Secure.LOCK_DOTS_VISIBLE);
             MOVED_TO_SECURE.add(Secure.LOCK_PATTERN_TACTILE_FEEDBACK_ENABLED);
-            MOVED_TO_SECURE.add(Secure.LOCK_NUMPAD_RANDOM);
             MOVED_TO_SECURE.add(Secure.LOGGING_ID);
             MOVED_TO_SECURE.add(Secure.PARENTAL_CONTROL_ENABLED);
             MOVED_TO_SECURE.add(Secure.PARENTAL_CONTROL_LAST_UPDATE);
@@ -5348,16 +5347,6 @@ public final class Settings {
          */
         public static final String LOCK_BEFORE_UNLOCK =
             "lock_before_unlock";
-
-        /**
-         * Whether the NumKeyPad will change the orders of numbers
-         * in a PIN locked lockscreen
-         * 0 = off | 1 = always | 2 = only on request
-         * @hide
-          */
-
-        public static final String LOCK_NUMPAD_RANDOM =
-            "lock_numpad_random";
 
         /**
          * Determines the width and height of the LockPatternView widget
