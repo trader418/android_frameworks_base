@@ -46,6 +46,7 @@ import static com.android.internal.util.cm.QSConstants.TILE_WIFI;
 import static com.android.internal.util.cm.QSConstants.TILE_WIFIAP;
 import static com.android.internal.util.cm.QSConstants.TILE_WIMAX;
 import static com.android.internal.util.cm.QSConstants.TILE_REBOOT;
+import static com.android.internal.util.cm.QSConstants.TILE_HALO;
 
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
@@ -97,6 +98,7 @@ import com.android.systemui.quicksettings.WiFiDisplayTile;
 import com.android.systemui.quicksettings.WiFiTile;
 import com.android.systemui.quicksettings.WifiAPTile;
 import com.android.systemui.quicksettings.RebootTile;
+import com.android.systemui.quicksettings.HaloTile;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -259,6 +261,8 @@ public class QuickSettingsController {
                 if (QSUtils.adbEnabled(resolver)) {
                     qs = new NetworkAdbTile(mContext, this);
                 }
+            } else if (tile.equals(TILE_HALO)) {
+                qs = new HaloTile(mContext, this, mHandler);
             }
 
             if (qs != null) {
