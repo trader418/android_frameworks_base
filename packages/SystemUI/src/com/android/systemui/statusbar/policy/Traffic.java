@@ -15,38 +15,24 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 public class Traffic extends TextView {
-
     public static final String TAG = "Traffic";
-
     private boolean mAttached;
-
     boolean trafficMeterEnable;
-
     boolean trafficMeterHide;
     int trafficMeterSummaryTime;
     long totalRxBytes;
-
     long lastUpdateTime;
-
     long trafficBurstStartTime;
-
     long trafficBurstStartBytes;
-
     long keepOnUntil = Long.MIN_VALUE;
-
     NumberFormat decimalFormat = new DecimalFormat("##0.0");
-
     NumberFormat integerFormat = NumberFormat.getIntegerInstance();
 
-    //protected int mStatusBarTrafficColor = com.android.internal.R.color.holo_blue_light;
-
     class SettingsObserver extends ContentObserver {
-
         SettingsObserver(Handler handler) {
             super(handler);
         }
@@ -70,6 +56,7 @@ public class Traffic extends TextView {
         public void onChange(boolean selfChange) {
             updateSettings();
         }
+
     }
 
     public Traffic(Context context) {
@@ -82,15 +69,12 @@ public class Traffic extends TextView {
 
     public Traffic(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        //mHandler = new Handler();
-
         updateSettings();
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-
         if (!mAttached) {
             mAttached = true;
             IntentFilter filter = new IntentFilter();
@@ -101,15 +85,11 @@ public class Traffic extends TextView {
             SettingsObserver settingsObserver = new SettingsObserver(getHandler());
             settingsObserver.observe();
         }
-
-        //setOnSystemUiVisibilityChangeListener(this);
-        //updateSettings();
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-
         if (mAttached) {
             getContext().unregisterReceiver(mIntentReceiver);
             mAttached = false;
@@ -126,36 +106,13 @@ public class Traffic extends TextView {
         }
     };
 
-    /*@Override
-    public void onSystemUiVisibilityChange(int visibility) {
-        Log.d(TAG, "onSystemUiVisibilityChange " + visibility);
-
-        if (visibility != 0) {
-            stopTrafficUpdates();
-        } else {
-            startTrafficUpdates();
-        }
-    }*/
-
-    /*@Override
-    public void onWindowSystemUiVisibilityChanged(int visible) {
-        Log.d(TAG, "onWindowSystemUiVisibilityChanged " + visible);
-
-        onSystemUiVisibilityChange(visible);
-
-        super.onWindowSystemUiVisibilityChanged(visible);
-    }*/
-
     @Override
     public void onScreenStateChanged(int screenState) {
-        //Log.d(TAG, "onScreenStateChanged " + screenState);
-
         if (screenState == SCREEN_STATE_OFF) {
             stopTrafficUpdates();
         } else {
             startTrafficUpdates();
         }
-
         super.onScreenStateChanged(screenState);
     }
 
@@ -165,7 +122,6 @@ public class Traffic extends TextView {
     }
 
     public void startTrafficUpdates() {
-        //Log.d(TAG, "startTrafficUpdates");
 
         if (getConnectAvailable()) {
             totalRxBytes = TrafficStats.getTotalRxBytes();
@@ -212,72 +168,61 @@ public class Traffic extends TextView {
         return false;
     }
 
-    /*Handler mTrafficHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-        }
-    };*/
-
     Runnable mRunnable = new Runnable() {
         @Override
         public void run() {
-            //mTrafficHandler.sendEmptyMessage(0);
-            long td = SystemClock.elapsedRealtime() - lastUpdateTime;
+            // Handling the systemUI FC's when toggling UI inverted mode         
+            try {        
+                long td = SystemClock.elapsedRealtime() - lastUpdateTime;
 
-            if (td == 0 || !trafficMeterEnable) {
-                // we just updated the view, nothing further to do
-                return;
+                if (td == 0 || !trafficMeterEnable) {
+                    // we just updated the view, nothing further to do
+                    return;
+                }
+
+                long currentRxBytes = TrafficStats.getTotalRxBytes();
+                long newBytes = currentRxBytes - totalRxBytes;
+
+                if (trafficMeterHide && newBytes == 0) {
+                    long trafficBurstBytes = currentRxBytes - trafficBurstStartBytes;
+
+                    if (trafficBurstBytes != 0 && trafficMeterSummaryTime != 0) { 
+                        setText(formatTraffic(trafficBurstBytes, false));
+
+                        Log.i(TAG,
+                                "Traffic burst ended: " + trafficBurstBytes + "B in "
+                                        + (SystemClock.elapsedRealtime() - trafficBurstStartTime)
+                                        / 1000 + "s");
+                        keepOnUntil = SystemClock.elapsedRealtime() + trafficMeterSummaryTime; 
+                        trafficBurstStartTime = Long.MIN_VALUE;
+                        trafficBurstStartBytes = currentRxBytes;
+                    }
+                } else {
+                    if (trafficMeterHide && trafficBurstStartTime == Long.MIN_VALUE) {
+                        trafficBurstStartTime = lastUpdateTime;
+                        trafficBurstStartBytes = totalRxBytes;
+                    }
+                    setText(formatTraffic(newBytes * 1000 / td, true));
+                }
+
+                // Hide if there is no traffic
+                if (trafficMeterHide && newBytes == 0) {
+                    if (getVisibility() != GONE
+                            && keepOnUntil < SystemClock.elapsedRealtime()) {
+                        setText("");
+                        setVisibility(View.GONE);
+                    }
+                } else {
+                    if (getVisibility() != VISIBLE) {
+                        setVisibility(View.VISIBLE);
+                    }
+                }
+
+                totalRxBytes = currentRxBytes;
+                lastUpdateTime = SystemClock.elapsedRealtime();
+                getHandler().postDelayed(mRunnable, 1000);
+            } catch (Exception ex) {
             }
-
-            long currentRxBytes = TrafficStats.getTotalRxBytes();
-            long newBytes = currentRxBytes - totalRxBytes;
-
-            //Log.d(TAG, "newBytes: " + newBytes);
-
-            if (trafficMeterHide && newBytes == 0) {
-                long trafficBurstBytes = currentRxBytes - trafficBurstStartBytes;
-
-                if (trafficBurstBytes != 0 && trafficMeterSummaryTime != 0) {
-                    setText(formatTraffic(trafficBurstBytes, false));
-
-                    Log.i(TAG,
-                            "Traffic burst ended: " + trafficBurstBytes + "B in "
-                                    + (SystemClock.elapsedRealtime() - trafficBurstStartTime)
-                                    / 1000 + "s");
-                    keepOnUntil = SystemClock.elapsedRealtime() + trafficMeterSummaryTime;
-                    trafficBurstStartTime = Long.MIN_VALUE;
-                    trafficBurstStartBytes = currentRxBytes;
-                }
-            } else {
-                if (trafficMeterHide && trafficBurstStartTime == Long.MIN_VALUE) {
-                    trafficBurstStartTime = lastUpdateTime;
-                    trafficBurstStartBytes = totalRxBytes;
-
-                    /*Log.d(TAG, "Traffic burst started: " + trafficBurstStartBytes + "B at "
-                            + trafficBurstStartTime + "ms");*/
-                }
-
-                setText(formatTraffic(newBytes * 1000 / td, true));
-            }
-
-            // Hide if there is no traffic
-            if (trafficMeterHide && newBytes == 0) {
-                if (getVisibility() != GONE
-                        && keepOnUntil < SystemClock.elapsedRealtime()) {
-                    setText("");
-                    setVisibility(View.GONE);
-                }
-            } else {
-                if (getVisibility() != VISIBLE) {
-                    setVisibility(View.VISIBLE);
-                }
-            }
-
-            totalRxBytes = currentRxBytes;
-            lastUpdateTime = SystemClock.elapsedRealtime();
-
-            getHandler().postDelayed(mRunnable, 1000);
         }
     };
 
@@ -294,9 +239,10 @@ public class Traffic extends TextView {
                 Settings.System.STATUS_BAR_TRAFFIC_COLOR, 0xFF33b5e5);
 
         int mStatusBarTrafficColor = Settings.System.getInt(resolver,
-                Settings.System.STATUS_BAR_TRAFFIC_COLOR, -2);
+                    Settings.System.STATUS_BAR_TRAFFIC_COLOR, -2);
+
         if (mStatusBarTrafficColor == Integer.MIN_VALUE
-                || mStatusBarTrafficColor == -2) {
+            || mStatusBarTrafficColor == -2) {
             // flag to reset the color
             mStatusBarTrafficColor = defaultColor;
         }
