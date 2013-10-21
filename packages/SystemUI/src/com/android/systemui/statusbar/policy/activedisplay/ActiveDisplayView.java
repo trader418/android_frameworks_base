@@ -925,9 +925,7 @@ public class ActiveDisplayView extends FrameLayout {
         try {
             Context pkgContext = mContext.createPackageContext(sbn.getPackageName(), Context.CONTEXT_RESTRICTED);
             mNotificationDrawable = pkgContext.getResources().getDrawable(sbn.getNotification().icon);
-            if (mNotificationDrawable != null) {
-                mCurrentNotificationIcon.setImageDrawable(mNotificationDrawable);
-            } 
+            mCurrentNotificationIcon.setImageDrawable(mNotificationDrawable);
             setHandleText(sbn);
             mNotification = sbn;
             mGlowPadView.post(new Runnable() {
