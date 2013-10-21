@@ -139,7 +139,7 @@ public class ActiveDisplayView extends FrameLayout {
     private int mIconSize;
     private int mIconMargin;
     private int mIconPadding;
-    private long mPocketTime = 0;
+    private long mPocketTime;
     private LinearLayout.LayoutParams mOverflowLayoutParams;
     private KeyguardManager mKeyguardManager;
     private KeyguardLock mKeyguardLock;
@@ -706,7 +706,6 @@ public class ActiveDisplayView extends FrameLayout {
         if (mPocketModeEnabled && mDisplayNotifications) {
 	    Log.i(TAG, "ActiveDisplay: enable ProximitySensor"); 
             mProximityIsFar = true;
-            mPocketTime = 0;
             registerSensorListener(mProximitySensor);
         }
     }
@@ -782,7 +781,7 @@ public class ActiveDisplayView extends FrameLayout {
     }
 
     private void unregisterNotificationListener() {
-        if (mNotificationListener != null) {
+        if (mNotificationListener !=  null) {
             try {
                 mNM.unregisterListener(mNotificationListener, UserHandle.USER_ALL);
             } catch (RemoteException e) {
@@ -1041,7 +1040,7 @@ public class ActiveDisplayView extends FrameLayout {
         RemoteViews rv = useBigContent ? notification.bigContentView : notification.contentView;
         if (rv != null) {
             if (mRemoteView != null) mRemoteViewLayout.removeView(mRemoteView);
-            if (useBigContent) {
+            if (useBigContent)  {
                 rv.removeAllViews(com.android.internal.R.id.actions);
                 rv.setViewVisibility(com.android.internal.R.id.action_divider, View.GONE);
                 mRemoteViewLayoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
@@ -1092,7 +1091,7 @@ public class ActiveDisplayView extends FrameLayout {
                 if (isFar) { 
                     mProximityIsFar = true;
                     if (!isScreenOn() && mPocketModeEnabled && !isOnCall() && !inQuietHours()) {
-                        if (System.currentTimeMillis() >= (mPocketTime + POCKET_THRESHOLD) && mPocketTime != 0){
+                        if (System.currentTimeMillis() >= (mPocketTime + POCKET_THRESHOLD)) {
                             mWakedByPocketMode = true;
 			    Log.i(TAG, "ActiveDisplay: waked by Pocketmode"); 
 
