@@ -162,8 +162,7 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback {
     private NotificationData mNotificationData;
     private String mNotificationText = "";
 
-    private Paint mPaintHoloBlue = new Paint();
-    private Paint mPaintWhite = new Paint();
+    private Paint mPaintHolo = new Paint(); 
     private Paint mPaintHoloRed = new Paint();
 
     private boolean mAttached = false;
@@ -187,6 +186,9 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback {
     private int mStatusB_X;
     private int mMarkerIndex = -1;
     private int mDismissDelay = 100;
+
+    private int mNotifTitleColor;
+    private int mNotifDescColor;
 
     private int oldIconIndex = -1;
     private float initialX = 0;
@@ -218,6 +220,20 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback {
                     Settings.System.HALO_NOTIFY_COUNT), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.HAPTIC_FEEDBACK_ENABLED), false, this);
+	    resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.HALO_COLOR), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.HALO_CIRCLE_COLOR), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.HALO_EFFECT_COLOR), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.HALO_NOTIFICATION_TITLE_COLOR), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.HALO_NOTIFICATION_DESC_COLOR), false, this);
+	    resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.HALO_SPEECH_BUBBLE_COLOR), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.HALO_TEXT_COLOR), false, this); 
         }
 
         @Override
@@ -228,7 +244,8 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback {
                     Settings.System.getInt(mContext.getContentResolver(), Settings.System.HALO_HIDE, 0) == 1;
             mNinjaMode =
                     Settings.System.getInt(mContext.getContentResolver(), Settings.System.HALO_NINJA, 0) == 1;
-            if (!selfChange) {
+            updateHaloColors(); 
+	    if (!selfChange) {
                 mBar.restartHalo();
                 mEffect.nap(HaloEffect.SNAP_TIME + 1000);
                 if (mHideTicker) mEffect.sleep(HaloEffect.SNAP_TIME + HaloEffect.NAP_TIME + 2500, HaloEffect.SLEEP_TIME, false);
@@ -306,10 +323,8 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback {
         mTriggerPos = getWMParams();
 
         // Init colors
-        mPaintHoloBlue.setAntiAlias(true);
-        mPaintHoloBlue.setColor(0xff33b5e5);
-        mPaintWhite.setAntiAlias(true);
-        mPaintWhite.setColor(0xfff0f0f0);
+        mPaintHolo.setAntiAlias(true);
+        mPaintHolo.setColor(0xff33b5e5); 
         mPaintHoloRed.setAntiAlias(true);
         mPaintHoloRed.setColor(0xffcc0000);
 
@@ -330,6 +345,8 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback {
               PixelFormat.TRANSLUCENT);
         lp.gravity = Gravity.LEFT|Gravity.TOP;
         mWindowManager.addView(mEffect, lp);
+
+	updateHaloColors(); 
     }
 
     private void initControl() {
@@ -425,6 +442,32 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback {
     public void update() {
         if (mEffect != null) mEffect.invalidate();
     }
+
+    private void updateHaloColors(){
+        mEffect.mEnableCustomColor = Settings.System.getInt(mContext.getContentResolver(), Settings.System.HALO_COLOR, 0) == 1;
+        if(mEffect.mEnableCustomColor) {
+          mEffect.setHaloCircleColor(
+              Settings.System.getInt(mContext.getContentResolver(), Settings.System.HALO_CIRCLE_COLOR, 0xFF33B5E5)
+              );
+	  mEffect.setHaloSpeechColor(
+              Settings.System.getInt(mContext.getContentResolver(), Settings.System.HALO_SPEECH_BUBBLE_COLOR, 0xff086a99)
+              );
+          mEffect.setHaloTextColor(
+              Settings.System.getInt(mContext.getContentResolver(), Settings.System.HALO_TEXT_COLOR, 0xffffffff)
+              ); 
+          mPaintHolo.setColor(
+              Settings.System.getInt(mContext.getContentResolver(), Settings.System.HALO_EFFECT_COLOR, 0xff33b5e5)
+              );
+          mNotifTitleColor = 
+              Settings.System.getInt(mContext.getContentResolver(), Settings.System.HALO_NOTIFICATION_TITLE_COLOR, 0xffffffff);
+          mNotifDescColor = 
+              Settings.System.getInt(mContext.getContentResolver(), Settings.System.HALO_NOTIFICATION_DESC_COLOR, 0xff999999);
+        } else {
+          mEffect.mHaloBg.clearColorFilter();
+          mEffect.clearColorFilters(); 
+          mPaintHolo.setColor(0xFF33B5E5);
+        }
+    } 
 
     private void updateTriggerPosition(int x, int y) {
         try {
@@ -1127,6 +1170,41 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback {
 
             setHaloContentHeight(mContext.getResources().getDimensionPixelSize(R.dimen.notification_min_height));
             mHaloTickerContent.setVisibility(View.VISIBLE);
+
+	    /* 
+             * This should work for every standard text notification
+             * By writing a recursive function getting all textviews and logging its text,
+             * I found out the following:
+             * The title is normally child 0 of child 0 of child 0 of mHaloTickerContent.
+             * The description normally is child 0 of child 3 of child 0 of mHaloTickerContent.
+             * If you know an easier way, to change title/description color, please let me know.
+             */
+            if(mEffect.mEnableCustomColor){
+                ViewGroup vg = (ViewGroup)mHaloTickerContent;
+                TextView tv;
+              if(vg.getChildAt(0) instanceof LinearLayout){
+                vg = (ViewGroup)vg.getChildAt(0);
+                if(vg.getChildAt(0) instanceof LinearLayout){
+                  vg = (ViewGroup)vg.getChildAt(0);
+                  if(vg.getChildAt(0) instanceof TextView){
+                    tv = (TextView)vg.getChildAt(0);
+                        tv.setTextColor(mNotifTitleColor);
+                  }
+                }
+              }
+                vg = (ViewGroup)mHaloTickerContent;
+              if(vg.getChildAt(0) instanceof LinearLayout){
+                vg = (ViewGroup)vg.getChildAt(0);
+                if(vg.getChildAt(3) instanceof LinearLayout){
+                  vg = (ViewGroup)vg.getChildAt(3);
+                  if(vg.getChildAt(0) instanceof TextView){
+                    tv = (TextView)vg.getChildAt(0);
+                        tv.setTextColor(mNotifDescColor);
+                  }
+                }
+              }
+            }
+ 
             mHaloTextView.setVisibility(View.GONE);
             updateResources(mTickerLeft);
 
@@ -1500,7 +1578,7 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback {
     }
 
     void clearTicker() {
-        mEffect.mHaloIcon.setImageDrawable(null);
+        mEffect.setNotificationIcon(null); 
         mEffect.msgNumberAlphaAnimator.cancel(true);
         mEffect.msgNumberFlipAnimator.cancel(true);
         mEffect.tickerAnimator.cancel(true);
@@ -1528,8 +1606,7 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback {
         mCurrentNotficationEntry = entry;
 
         // set the avatar
-        mEffect.setHaloOverlay(HaloProperties.Overlay.NONE,0f);
-        mEffect.mHaloIcon.setImageDrawable(new BitmapDrawable(mContext.getResources(), entry.getRoundIcon()));
+        mEffect.setNotificationIcon(new BitmapDrawable(mContext.getResources(), entry.getRoundIcon()));
 
         if (showContent && mState != State.SILENT) {
             if (entry.haloContent != null) {
@@ -1611,7 +1688,7 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback {
                             tick(entry, HaloEffect.WAKE_TIME * 2, 1000, true, showMsgBox, false);
 
                             // Pop while not tasking, only if notification is certified fresh
-                            if (mGesture != Gesture.TASK && mState != State.SILENT) mEffect.ping(mPaintHoloBlue, HaloEffect.WAKE_TIME * 2);
+                            if (mGesture != Gesture.TASK && mState != State.SILENT) mEffect.ping(mPaintHolo, HaloEffect.WAKE_TIME * 2); 
                         }
                     }
                     break;
@@ -1761,7 +1838,7 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback {
                                 if (mHideTicker) mEffect.sleep(HaloEffect.SLEEP_DELAY + HaloEffect.WAKE_TIME * 2, HaloEffect.SLEEP_TIME, false);
                                 boolean showMsgBox = Settings.System.getInt(mContext.getContentResolver(), Settings.System.HALO_MSGBOX, 1) == 1;
                                 tick(entry, HaloEffect.WAKE_TIME * 2, 1000, false, showMsgBox, false);
-                                mEffect.ping(mPaintHoloBlue, HaloEffect.WAKE_TIME * 2);
+                                mEffect.ping(mPaintHolo, HaloEffect.WAKE_TIME * 2); 
                                 mPingNewcomer = false;
                             }
                     }
