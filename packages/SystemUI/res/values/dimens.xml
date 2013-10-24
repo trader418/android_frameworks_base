@@ -225,7 +225,7 @@
     <dimen name="notification_shortcuts_drawer_margin">88dp</dimen>
 
     <!-- The padding of the items of the battery cluster -->
-    <dimen name="status_bar_battery_cluster_padding">2dip</dimen>
+    <dimen name="status_bar_battery_cluster_padding">4dip</dimen>
     <!-- The margin adjusment of the text items of the battery cluster -->
     <dimen name="status_bar_battery_cluster_text_margin">-1dip</dimen>
 
