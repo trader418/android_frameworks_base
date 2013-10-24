@@ -522,17 +522,17 @@ public class PhoneStatusBar extends BaseStatusBar {
     }
 
     private void updateCarrierMargin() {
-        lpScrollView.bottomMargin = mNotificationShortcutsToggle ? mShortcutsDrawerMargin : 0; 
-        mScrollView.setLayoutParams(lpScrollView);
+        //lpScrollView.bottomMargin = mNotificationShortcutsToggle ? mShortcutsDrawerMargin : 0; 
+        //mScrollView.setLayoutParams(lpScrollView);
 
-        lpCarrierLabel.bottomMargin = mNotificationShortcutsToggle ? mShortcutsSpacingHeight : mCloseViewHeight;
+        //lpCarrierLabel.bottomMargin = mNotificationShortcutsToggle ? mShortcutsSpacingHeight : mCloseViewHeight;
         
-        mCarrierLabel.setLayoutParams(lpCarrierLabel); 
+        //mCarrierLabel.setLayoutParams(lpCarrierLabel); 
     }
 
     private void toggleCarrierAndWifiLabelVisibility() {
-        updateCarrierMargin();
-        mCarrierLabel.setVisibility(mShowCarrierInPanel ? View.VISIBLE : View.INVISIBLE);
+        //updateCarrierMargin();
+        //mCarrierLabel.setVisibility(mShowCarrierInPanel ? View.VISIBLE : View.INVISIBLE);
     }
 
     private void cleanupRibbon() {
