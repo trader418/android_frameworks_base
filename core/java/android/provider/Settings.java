@@ -2710,7 +2710,13 @@ public final class Settings {
          */
         public static final String PIE_CONTROLS = "pie_controls";
 
-	/**
+        /**
+         * Whether dynamic menu button is shown or not or dynamic (default)
+         * @hide
+         */
+        public static final String PIE_MENU = "pie_menu";
+
+        /**
          * Whether right edge PIE is mirrored or not
          * @hide
          */
