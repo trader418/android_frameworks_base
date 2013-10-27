@@ -422,6 +422,7 @@ public interface WindowManagerPolicy {
         public void shutdown(boolean confirm);
         public void rebootSafeMode(boolean confirm);
         public void reboot();
+	public void rebootTile();
     }
 
     /** Window has been added to the screen. */

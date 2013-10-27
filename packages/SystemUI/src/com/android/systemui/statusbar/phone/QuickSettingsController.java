@@ -46,6 +46,7 @@ import static com.android.internal.util.cm.QSConstants.TILE_WIFI;
 import static com.android.internal.util.cm.QSConstants.TILE_WIFIAP;
 import static com.android.internal.util.cm.QSConstants.TILE_WIMAX;
 import static com.android.internal.util.cm.QSConstants.TILE_HALO;
+import static com.android.internal.util.cm.QSConstants.TILE_POWER;  
 
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
@@ -97,6 +98,7 @@ import com.android.systemui.quicksettings.WiFiDisplayTile;
 import com.android.systemui.quicksettings.WiFiTile;
 import com.android.systemui.quicksettings.WifiAPTile;
 import com.android.systemui.quicksettings.HaloTile;
+import com.android.systemui.quicksettings.PowerMenuTile; 
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -250,6 +252,8 @@ public class QuickSettingsController {
                 qs = new NfcTile(mContext, this);
             } else if (tile.equals(TILE_WIMAX)) {
                 // Not available yet
+	    } else if (tile.equals(TILE_POWER)) {
+                qs = new PowerMenuTile(mContext, this);     
             } else if (tile.equals(TILE_LTE)) {
                 qs = new LteTile(mContext, this);
             } else if (tile.equals(TILE_QUIETHOURS)) {

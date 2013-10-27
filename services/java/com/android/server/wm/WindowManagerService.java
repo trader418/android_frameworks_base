@@ -5013,6 +5013,12 @@ public class WindowManagerService extends IWindowManager.Stub
         ShutdownThread.reboot(getUiContext(), null, true);
     }
 
+    // Called by window manager policy.  Not exposed externally.
+    @Override
+    public void rebootTile() {
+        ShutdownThread.reboot(mContext, null, true);
+    } 
+
     public void setCurrentUser(final int newUserId) {
         synchronized (mWindowMap) {
             mCurrentUserId = newUserId;
