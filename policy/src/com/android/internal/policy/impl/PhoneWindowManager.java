@@ -2537,7 +2537,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             // Hijack modified menu keys for debugging features
             final int chordBug = KeyEvent.META_SHIFT_ON;
 
-            if (virtualKey) {
+            if (virtualKey || keyguardOn) {
                 // Let the app handle the key
                 return 0;
             }
@@ -2570,7 +2570,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                         return -1;
                     }
                 } else if (longPress) {
-                    if (!keyguardOn && mLongPressOnMenuBehavior != KEY_ACTION_NOTHING) {
+                    if (mLongPressOnMenuBehavior != KEY_ACTION_NOTHING) {
                         if (mLongPressOnMenuBehavior != KEY_ACTION_APP_SWITCH) {
                             cancelPreloadRecentApps();
                         }
@@ -2588,7 +2588,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     if (mPressOnMenuBehavior != KEY_ACTION_APP_SWITCH) {
                         cancelPreloadRecentApps();
                     }
-                    if (!canceled && !keyguardOn) {
+                    if (!canceled) {
                         performKeyAction(mPressOnMenuBehavior);
                     }
                 }
