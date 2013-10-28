@@ -3282,6 +3282,18 @@ public final class Settings {
         public static final String NOTIFICATIONS_BEHAVIOUR = "notifications_behaviour"; 
 
         /**
+         * Whether to show the network status in the status bar
+         * @hide
+         */
+        public static final String STATUS_BAR_NETWORK_STATS = "status_bar_network_stats";
+ 
+        /**
+         * Frequency at which stats are updated, in milliseconds
+         * @hide
+         */
+        public static final String STATUS_BAR_NETWORK_STATS_UPDATE_INTERVAL = "status_bar_network_stats_update_frequency";
+
+        /**
          * Circle battery icon color
          * in statusbar
          */
