@@ -3192,12 +3192,6 @@ public final class Settings {
          */
         public static final String APP_SIDEBAR_POSITION = "app_sidebar_position";
 
-       /**
-        * Show summary of traffic.
-        * @hide
-        */
-        public static final String STATUS_BAR_TRAFFIC_SUMMARY = "status_bar_traffic_summary";
-
         /**
          * Width of the appbar trigger
          *
@@ -3437,24 +3431,6 @@ public final class Settings {
          * @hide
          */
         public static final String EXPANDED_DESKTOP_STYLE = "expanded_desktop_style";
-
-        /**
-         * Hide network speed indicator when there is no traffic
-         * @hide
-         */
-        public static final String STATUS_BAR_TRAFFIC_HIDE = "status_bar_traffic_hide";
-
-        /**
-         * Network speed indicator
-         * @hide
-         */
-        public static final String STATUS_BAR_TRAFFIC_ENABLE = "status_bar_traffic_enable";
-
-	/**
-         * Sets color of statusbar traffic indicator
-         * @hide
-         */
-        public static final String STATUS_BAR_TRAFFIC_COLOR = "status_bar_traffic_color";
 
         /**
          * Whether Status bar should be hiidden when there are no
