@@ -3133,6 +3133,18 @@ public final class Settings {
         public static final String PROXIMITY_ON_WAKE = "proximity_on_wake";
 
         /**
+         * Whether lid wakes the device
+         * @hide
+         */
+        public static final String LID_CONTROLS_WAKE = "lid_controls_wake";
+
+        /**
+         * Whether lid puts the device to sleep
+         * @hide
+         */
+        public static final String LID_CONTROLS_SLEEP = "lid_controls_sleep";
+
+        /**
          * Displays a notification when wifi network has changed
          * 0 - default (off)
          * 1 - toast
