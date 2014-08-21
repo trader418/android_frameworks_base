@@ -2043,6 +2043,7 @@
    <java-symbol type="anim" name="last_app_in" />
    <java-symbol type="anim" name="last_app_out" />
 
-=======
->>>>>>> parent of f02a48c... Use actual storage type of sdcard/usb (1/2).
+  <!-- USB OTG Notification -->
+  <java-symbol type="string" name="usb_storage_notification_manage_message" />
+
 </resources>
