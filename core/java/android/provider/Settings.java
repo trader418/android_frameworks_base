@@ -4164,12 +4164,6 @@ public final class Settings {
         public static final String EXPANDED_DESKTOP_SYSTEM_BARS_VISIBILITY = "expanded_desktop_system_bars_visibility";
 
         /**
-         * Whether national data roaming should be used.
-         * @hide
-         */
-        public static final String MVNO_ROAMING = "mvno_roaming";
-
-        /**
          * Use EdgeGesture Service for system gestures in PhoneWindowManager
          * @hide
          */
