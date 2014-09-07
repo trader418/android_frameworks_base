@@ -4973,12 +4973,6 @@ public final class Settings {
         public static final int INCOMING_CALL_STYLE_FULLSCREEN_PHOTO = 1;
 
         /**
-         * Adjust the vibration multiplier to control vibration strength
-         * @hide
-         */
-        public static final String VIBRATION_MULTIPLIER = "vibration_multiplier";
-
-        /**
          * Recent card background color
          *
          * @hide
