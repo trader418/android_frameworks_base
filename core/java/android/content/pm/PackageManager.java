@@ -3307,6 +3307,14 @@ public abstract class PackageManager {
     public abstract void updateIconMaps(String pkgName);
 
     /**
+     * Used to compile theme resources for a given theme
+     * @param themePkgName
+     *
+     * @hide
+     */
+    public abstract void processThemeResources(String themePkgName);
+
+    /**
      * Update Component protection state
      * @hide
      */
