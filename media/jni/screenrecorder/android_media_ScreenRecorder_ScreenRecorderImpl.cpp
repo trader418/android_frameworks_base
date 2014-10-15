@@ -63,7 +63,7 @@ static const char* const kClassPathName = "android/media/screenrecorder/ScreenRe
 
 static const uint32_t kMinBitRate = 100000; // 0.1Mbps
 static const uint32_t kMaxBitRate = 100 * 1000000; // 100Mbps
-static const uint32_t kMaxTimeLimitSec = 300; // 5 minutes
+static const uint32_t kMaxTimeLimitSec = 1800; // 30 minutes
 static const uint32_t kFallbackWidth = 1280; // 720p
 static const uint32_t kFallbackHeight = 720;
 // Audio related
