@@ -53,9 +53,9 @@ public class BarBackgroundUpdater {
 
     private static long sMinDelay = 450; // time to enforce between the screenshots
 
-    private static boolean PAUSED = true;
+    private static boolean sPaused = true;
 
-    private final static BroadcastReceiver RECEIVER = new BroadcastReceiver() {
+    private final static BroadcastReceiver sReceiver = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -70,14 +70,14 @@ public class BarBackgroundUpdater {
 
     };
 
-    private final static Thread THREAD = new Thread(new Runnable() {
+    private final static Thread sThread = new Thread(new Runnable() {
 
         @Override
         public void run() {
             while (true) {
                 final long now = System.currentTimeMillis();
 
-                if (PAUSED) {
+                if (sPaused) {
                     // we have been told to do nothing; wait for notify to continue
                     synchronized (BarBackgroundUpdater.class) {
                         try {
@@ -233,8 +233,8 @@ public class BarBackgroundUpdater {
     });
 
     static {
-        THREAD.setPriority(4);
-        THREAD.start();
+        sThread.setPriority(4);
+        sThread.start();
     }
 
     private static boolean mStatusEnabled = false;
@@ -273,7 +273,7 @@ public class BarBackgroundUpdater {
     }
 
     private synchronized static void setPauseState(final boolean isPaused) {
-        PAUSED = isPaused;
+        sPaused = isPaused;
         if (!isPaused) {
             // the thread should be notified to resume
             BarBackgroundUpdater.class.notify();
@@ -290,7 +290,7 @@ public class BarBackgroundUpdater {
 
     public synchronized static void init(final Context context) {
         if (mContext != null) {
-            mContext.unregisterReceiver(RECEIVER);
+            mContext.unregisterReceiver(sReceiver);
 
             if (mObserver != null) {
                 mContext.getContentResolver().unregisterContentObserver(mObserver);
@@ -303,7 +303,7 @@ public class BarBackgroundUpdater {
         final IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_SCREEN_ON);
         filter.addAction(Intent.ACTION_SCREEN_OFF);
-        mContext.registerReceiver(RECEIVER, filter);
+        mContext.registerReceiver(sReceiver, filter);
 
         if (mObserver == null) {
             mObserver = new SettingsObserver(new Handler());
@@ -390,22 +390,9 @@ public class BarBackgroundUpdater {
 
         return Color.argb(
                 Color.alpha(original),
-                red > 0 ?
-                        red < 255 ?
-                                red :
-                                255 :
-                        0,
-                green > 0 ?
-                        green < 255 ?
-                                green :
-                                255 :
-                        0,
-                blue > 0 ?
-                        blue < 255 ?
-                                blue :
-                                255 :
-                        0
-        );
+                red > 0 ? (red < 255 ? red : 255) : 0,
+                green > 0 ? (green < 255 ? green : 255) : 0,
+                blue > 0 ? (blue < 255 ? blue : 255) : 0);
     }
 
     private static int getPixel(final Bitmap bitmap, final int x, final int y) {

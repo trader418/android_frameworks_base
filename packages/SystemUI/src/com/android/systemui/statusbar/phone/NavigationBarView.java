@@ -1247,7 +1247,7 @@ public class NavigationBarView extends LinearLayout implements BaseStatusBar.Nav
 
     private static class StatusBarBlockerTransitions extends BarTransitions {
         public StatusBarBlockerTransitions(View statusBarBlocker) {
-            super(statusBarBlocker, new BarTransitions.BarBackgroundDrawable(
+            super(statusBarBlocker, new BarBackgroundDrawable(
                     statusBarBlocker.getContext(),
                     R.color.status_bar_background_opaque,
                     R.color.status_bar_background_semi_transparent,
