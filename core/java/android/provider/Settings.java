@@ -2848,13 +2848,6 @@ public final class Settings {
         public static final String LOCKSCREEN_ENABLE_POWER_MENU = "lockscreen_enable_power_menu";
 
         /**
-         * Bypass insecure lock screen when opening a smartcover or physical keyboard
-         *
-         * @hide
-         */
-        public static final String BYPASS_INSECURE_LOCKSCREEN = "bypass_insecure_lockscreen";
-
-        /**
          * Whether to display the gesture anywhere trigger region or not.
          * @hide
          */

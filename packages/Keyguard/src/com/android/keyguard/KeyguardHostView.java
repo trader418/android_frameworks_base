@@ -324,18 +324,13 @@ public class KeyguardHostView extends KeyguardViewBase {
         public void onLidStateChanged(int newState){
             //when lid goes open and no security is set -> unlock device
             if(newState == WindowManagerPolicy.WindowManagerFuncs.LID_OPEN
-                && mCurrentSecuritySelection == SecurityMode.None && bypassInsecureLockscreen()){
+                && mCurrentSecuritySelection == SecurityMode.None){
                 dismiss();
             }
         }
     };
 
-    public boolean bypassInsecureLockscreen() {
-        return Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.BYPASS_INSECURE_LOCKSCREEN, 0) != 0;
-    }
-
-   private static final boolean isMusicPlaying(int playbackState) {
+    private static final boolean isMusicPlaying(int playbackState) {
         // This should agree with the list in AudioService.isPlaystateActive()
         switch (playbackState) {
             case RemoteControlClient.PLAYSTATE_PLAYING:
