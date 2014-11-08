@@ -608,7 +608,7 @@ public class BatteryMeterView extends View implements DemoMode {
                                 : (tracker.level == 100 ? full : nofull)));
                 mTextHeight = -mTextPaint.getFontMetrics().ascent;
 
-                mTextPaint.setColor(doOverride ? mOverrideIconColor : 0xFF000000);
+                mTextPaint.setColor(0xFF000000);
 
                 final String str = String.valueOf(SINGLE_DIGIT_PERCENT ? (level/10) : level);
                 final float x  = mWidth * 0.5f;
