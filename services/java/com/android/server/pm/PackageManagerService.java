@@ -493,7 +493,7 @@ public class PackageManagerService extends IPackageManager.Stub {
     /** Token for keys in mPendingVerification. */
     private int mPendingVerificationToken = 0;
 
-    private static final int sNThreads = Runtime.getRuntime().availableProcessors() + 1;
+    private static final int sNThreads = Runtime.getRuntime().availableProcessors();
 
     boolean mSystemReady;
     boolean mSafeMode;
