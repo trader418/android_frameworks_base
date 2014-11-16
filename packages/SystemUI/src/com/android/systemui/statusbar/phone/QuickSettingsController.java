@@ -43,6 +43,7 @@ import static com.android.internal.util.cm.QSConstants.TILE_SCREENTIMEOUT;
 import static com.android.internal.util.cm.QSConstants.TILE_SETTINGS;
 import static com.android.internal.util.cm.QSConstants.TILE_SLEEP;
 import static com.android.internal.util.cm.QSConstants.TILE_SYNC;
+import static com.android.internal.util.cm.QSConstants.TILE_THEMES;
 import static com.android.internal.util.cm.QSConstants.TILE_TORCH;
 import static com.android.internal.util.cm.QSConstants.TILE_USER;
 import static com.android.internal.util.cm.QSConstants.TILE_VOLUME;
@@ -100,6 +101,7 @@ import com.android.systemui.quicksettings.RingerModeTile;
 import com.android.systemui.quicksettings.ScreenTimeoutTile;
 import com.android.systemui.quicksettings.SleepScreenTile;
 import com.android.systemui.quicksettings.SyncTile;
+import com.android.systemui.quicksettings.ThemesTile;
 import com.android.systemui.quicksettings.ToggleLockscreenTile;
 import com.android.systemui.quicksettings.TorchTile;
 import com.android.systemui.quicksettings.UsbTetherTile;
@@ -308,6 +310,8 @@ public class QuickSettingsController {
                 qs = new MusicTile(mContext, this);
             } else if (tile.equals(TILE_QUICKRECORD)) {
                 qs = new QuickRecordTile(mContext, this);
+            } else if (tile.equals(TILE_THEMES)) {
+                qs = new ThemesTile(mContext, this);
             }
 
             if (qs != null) {
