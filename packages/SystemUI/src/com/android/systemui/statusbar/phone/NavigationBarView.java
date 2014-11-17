@@ -789,7 +789,7 @@ public class NavigationBarView extends LinearLayout implements BaseStatusBar.Nav
                 && mLockUtils.getCameraEnabled();
         // TODO(): Ideally we should integrate with DevicePolicyManager for application widget too.
         final boolean showApplicationWidget = showSearch &&
-                mApplicationWidgetPackageName != null && mLockUtils.getApplicationWidgetEnabled();
+                mApplicationWidgetPackageName != null;
         final boolean showNotifs = showSearch &&
             Settings.System.getInt(mContext.getContentResolver(),
                         Settings.System.LOCKSCREEN_NOTIFICATIONS, 1) == 1 &&
@@ -1046,7 +1046,6 @@ public class NavigationBarView extends LinearLayout implements BaseStatusBar.Nav
                     changed?"changed":"notchanged", left, top, right, bottom));
         super.onLayout(changed, left, top, right, bottom);
     }
-
     // uncomment this for extra defensiveness in WORKAROUND_INVALID_LAYOUT situations: if all else
     // fails, any touch on the display will fix the layout.
     @Override
