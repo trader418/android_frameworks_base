@@ -20,4 +20,7 @@
   <java-symbol type="style" name="Animation.Toast.SlideRightLeft" />
   <java-symbol type="style" name="Animation.Toast.SlideLeftRight" />
 
+  <!-- Doze feature -->
+  <java-symbol type="bool" name="config_doze_enabled_by_default" />
+
 </resources>
