@@ -574,6 +574,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     // Behavior of home wake
     boolean mHomeWakeScreen;
 
+    // Behavior of volume wake
+    boolean mVolumeWakeScreen;
+
     SettingsObserver mSettingsObserver;
     ShortcutManager mShortcutManager;
     PowerManager.WakeLock mBroadcastWakeLock;
@@ -1617,6 +1620,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
             mHomeWakeScreen = (Settings.System.getIntForUser(resolver,
                     Settings.System.HOME_WAKE_SCREEN, 1, UserHandle.USER_CURRENT) == 1);
+
+            mVolumeWakeScreen = (Settings.System.getIntForUser(resolver,
+                    Settings.System.VOLUME_WAKE_SCREEN, 1, UserHandle.USER_CURRENT) == 1);
 
             // Configure wake gesture.
             boolean wakeGestureEnabledSetting = Settings.Secure.getIntForUser(resolver,
@@ -4843,9 +4849,15 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 && mHomeWakeScreen
                 && (keyCode == KeyEvent.KEYCODE_HOME);
 
+        final boolean isVolumeWakeKey = !isScreenOn()
+                && mVolumeWakeScreen
+                && (keyCode == KeyEvent.KEYCODE_VOLUME_UP
+                || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN);
+
         boolean isWakeKey = (policyFlags & WindowManagerPolicy.FLAG_WAKE) != 0
                 || event.isWakeKey()
-                || isHomeWakeKey;
+                || isHomeWakeKey
+                || isVolumeWakeKey;
 
         if (interactive || (isInjected && !isWakeKey)) {
             // When the device is interactive or the key is injected pass the
@@ -5152,6 +5164,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             // ignore volume keys unless docked
             case KeyEvent.KEYCODE_VOLUME_UP:
             case KeyEvent.KEYCODE_VOLUME_DOWN:
+                if (mVolumeWakeScreen) {
+                    return true;
+                }
             case KeyEvent.KEYCODE_VOLUME_MUTE:
                 return mDockMode != Intent.EXTRA_DOCK_STATE_UNDOCKED;
 
