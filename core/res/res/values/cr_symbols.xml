@@ -29,7 +29,4 @@
   <!-- In WiFi AP notification -->
   <java-symbol type="string" name="notify_turn_wifi_ap_off_title" />
 
-  <!-- Gesture panel -->
-  <java-symbol type="string" name="gesture_actions" />
-
 </resources>
