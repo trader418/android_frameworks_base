@@ -790,8 +790,9 @@ public class NetworkControllerImpl extends BroadcastReceiver
                 + " showAtLeastThreeGees=" + String.valueOf(mShowAtLeastThreeGees));
         }
 
+        int inetCondition = inetConditionForNetwork(ConnectivityManager.TYPE_MOBILE);
         TelephonyIcons.updateDataType(chosenNetworkType, mShowAtLeastThreeGees,
-            mShow4GforLTE, mHspaDataDistinguishable, mInetCondition);
+            mShow4GforLTE, mHspaDataDistinguishable, inetCondition);
     }
 
     protected void updateSimState(Intent intent) {
@@ -930,7 +931,7 @@ public class NetworkControllerImpl extends BroadcastReceiver
         }
     }
 
-    private int inetConditionForNetwork(int networkType) {
+    protected int inetConditionForNetwork(int networkType) {
         return (mInetCondition == 1 && mConnectedNetworkType == networkType) ? 1 : 0;
     }
 
@@ -1336,6 +1337,7 @@ public class NetworkControllerImpl extends BroadcastReceiver
         }
 
         // We want to update all the icons, all at once, for any condition change
+        updateIconSet();
         updateDataNetType();
         updateWimaxIcons();
         updateDataIcon();
