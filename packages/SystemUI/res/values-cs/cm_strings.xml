@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * Copyright (c) 2009, The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); 
+ * you may not use this file except in compliance with the License. 
+ * You may obtain a copy of the License at 
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0 
+ *
+ * Unless required by applicable law or agreed to in writing, software 
+ * distributed under the License is distributed on an "AS IS" BASIS, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="clear_recents">Ukončit všechny aplikace</string>
+    <string name="screenshot_delete_action">Smazat</string>
+    <string name="screenshot_delete_confirmation">Snímek obrazovky smazán.</string>
+    <string name="advanced_dev_option_wipe_app">Vymazat data aplikací</string>
+    <string name="advanced_dev_option_force_stop">Vynutit ukončení</string>
+    <string name="advanced_dev_option_uninstall">Odinstalovat</string>
+    <string name="status_bar_expanded_header_weather_format"><xliff:g id="temp">%1$s</xliff:g> - <xliff:g id="condition">%2$s</xliff:g></string>
+    <string name="accessibility_quick_settings_data_off">Mobilní data vypnuta</string>
+    <string name="accessibility_quick_settings_data_on">Mobilní data zapnuta</string>
+    <string name="accessibility_quick_settings_roaming_off">Roaming vypnut</string>
+    <string name="accessibility_quick_settings_roaming_on">Roaming zapnut</string>
+    <string name="quick_settings_mobile_data_label">Mobilní data</string>
+    <string name="quick_settings_roaming_label">Roaming</string>
+    <string name="quick_settings_apn_switch_label">APN přepínač</string>
+    <string name="quick_settings_dds_sub">Karta <xliff:g id="number">%d</xliff:g> data</string>
+    <string name="quick_settings_data_off">Data vypnuty</string>
+    <string name="tasklistview_title">Správce úloh</string>
+    <string name="message_switch_fail">Není možné přepnout na tuto úlohu, protože nemá žádné rozhraní.</string>
+    <string name="tasklist_killall">Ukončit vše</string>
+    <string name="tasklist_memory_usage">"Volná/celková paměť: [<xliff:g id="number">%s</xliff:g>] / [<xliff:g id="name">%s</xliff:g>]"</string>
+    <string name="message_keep_one_launcher">Měl by zůstat alespoň jeden launcher!</string>
+</resources>
