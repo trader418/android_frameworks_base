@@ -2121,6 +2121,12 @@ public final class Settings {
         public static final String QS_SMART_PULLDOWN = "qs_smart_pulldown";
 
         /**
+         * Timeout for ambient display notification
+         * @hide
+         */
+        public static final String DOZE_TIMEOUT = "doze_timeout";
+
+        /**
          * Whether to enable ticker animation in statusbar
          *
          * @hide
