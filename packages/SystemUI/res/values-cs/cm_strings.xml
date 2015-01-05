@@ -28,6 +28,7 @@
     <string name="accessibility_quick_settings_data_on">Mobilní data zapnuta</string>
     <string name="accessibility_quick_settings_roaming_off">Roaming vypnut</string>
     <string name="accessibility_quick_settings_roaming_on">Roaming zapnut</string>
+    <string name="accessibility_su_active">Superuser přístup je aktivní</string>
     <string name="quick_settings_mobile_data_label">Mobilní data</string>
     <string name="quick_settings_roaming_label">Roaming</string>
     <string name="quick_settings_apn_switch_label">APN přepínač</string>
@@ -38,4 +39,9 @@
     <string name="tasklist_killall">Ukončit vše</string>
     <string name="tasklist_memory_usage">"Volná/celková paměť: [<xliff:g id="number">%s</xliff:g>] / [<xliff:g id="name">%s</xliff:g>]"</string>
     <string name="message_keep_one_launcher">Měl by zůstat alespoň jeden launcher!</string>
+    <!-- Notify changed wifi network -->
+    <string name="wifi_status_changed">Nové spojení</string>
+    <string name="wifi_restored">Spojení obnoveno</string>
+    <string name="wifi_address_changed">Wi\u2011Fi SSID změneno na <xliff:g id="name">%s</xliff:g></string>
+    <string name="wifi_changed_ticker">Wi\u2011Fi SSID: <xliff:g id="name">%s</xliff:g></string>
 </resources>

@@ -67,6 +67,7 @@
     <string name="app_ops_access_location">zjišťovat polohu</string>
     <string name="app_ops_access_notifications">číst upozornění</string>
     <string name="app_ops_alarm_wakeup">probudit zařízení</string>
+    <string name="app_ops_su">získat Superuser přístup</string>
     <string name="app_ops_draw_on_top">vykreslovat do nejvyšší vrstvy</string>
     <string name="app_ops_keep_device_awake">udržovat zařízení probuzené</string>
     <string name="app_ops_make_phone_call">vytvářet telefonní hovory</string>
@@ -130,4 +131,8 @@
     <string name="stk_cc_ss_to_ss">Požadavek SS byl změněn na nový požadavek SS.</string>
     <string name="permission_remember_choice">Pamatovat volbu</string>
     <string name="permission">Oprávnění</string>
+    <string name="perf_profile_pwrsv">Úspora energie</string>
+    <string name="perf_profile_bal">Vyvážený</string>
+    <string name="perf_profile_perf">Výkon</string>
+    <string name="advanced_settings_title">Pokročilé</string>
 </resources>
