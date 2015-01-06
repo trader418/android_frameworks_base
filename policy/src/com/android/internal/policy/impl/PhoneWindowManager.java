@@ -402,17 +402,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     int mBackKillTimeout;
 
     int mDeviceHardwareKeys;
-    int mDeviceHardwareWakeKeys;
 
     // Button wake control flags
     boolean mHomeWakeScreen;
     boolean mBackWakeScreen;
     boolean mMenuWakeScreen;
     boolean mVolumeWakeScreen;
-    boolean useHomeWake;
-    boolean useBackWake;
-    boolean useMenuWake;
-    boolean useVolumeWake;
 
     // During wakeup by volume keys, we still need to capture subsequent events
     // until the key is released. This is required since the beep sound is produced
@@ -1353,8 +1348,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 com.android.internal.R.bool.config_enableTranslucentDecor);
         mDeviceHardwareKeys = mContext.getResources().getInteger(
                 com.android.internal.R.integer.config_deviceHardwareKeys);
-        mDeviceHardwareWakeKeys = mContext.getResources().getInteger(
-                com.android.internal.R.integer.config_deviceHardwareWakeKeys);
 
         updateKeyAssignments();
 
@@ -1477,7 +1470,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
     private void updateKeyAssignments() {
         int activeHardwareKeys = mDeviceHardwareKeys;
-        int activeHardwareWakeKeys = mDeviceHardwareWakeKeys;
 
         if (!hasHwKeysEnabled()) {
             activeHardwareKeys = 0;
@@ -1486,12 +1478,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         final boolean hasHome = (activeHardwareKeys & KEY_MASK_HOME) != 0;
         final boolean hasAssist = (activeHardwareKeys & KEY_MASK_ASSIST) != 0;
         final boolean hasAppSwitch = (activeHardwareKeys & KEY_MASK_APP_SWITCH) != 0;
-
-        useHomeWake = (activeHardwareWakeKeys & KEY_MASK_HOME) != 0;
-        useBackWake = (activeHardwareWakeKeys & KEY_MASK_BACK) != 0;
-        useMenuWake = (activeHardwareWakeKeys & KEY_MASK_MENU) != 0;
-        useVolumeWake = (activeHardwareWakeKeys & KEY_MASK_VOLUME) != 0;
-
         final ContentResolver resolver = mContext.getContentResolver();
 
         // Initialize all assignments to sane defaults.
@@ -1708,6 +1694,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     public void updateSettings() {
         ContentResolver resolver = mContext.getContentResolver();
         boolean updateRotation = false;
+        int mDeviceHardwareWakeKeys = mContext.getResources().getInteger(
+                com.android.internal.R.integer.config_deviceHardwareWakeKeys);
         synchronized (mLock) {
             mEndcallBehavior = Settings.System.getIntForUser(resolver,
                     Settings.System.END_BUTTON_BEHAVIOR,
@@ -1722,13 +1710,17 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     Settings.Secure.RING_HOME_BUTTON_BEHAVIOR_DEFAULT,
                     UserHandle.USER_CURRENT);
             mHomeWakeScreen = (Settings.System.getIntForUser(resolver,
-                    Settings.System.HOME_WAKE_SCREEN, 1, UserHandle.USER_CURRENT) == 1);
+                    Settings.System.HOME_WAKE_SCREEN, 1, UserHandle.USER_CURRENT) == 1) &&
+                    ((mDeviceHardwareWakeKeys & KEY_MASK_HOME) != 0);
             mBackWakeScreen = (Settings.System.getIntForUser(resolver,
-                    Settings.System.BACK_WAKE_SCREEN, 0, UserHandle.USER_CURRENT) == 1);
+                    Settings.System.BACK_WAKE_SCREEN, 0, UserHandle.USER_CURRENT) == 1) &&
+                    ((mDeviceHardwareWakeKeys & KEY_MASK_BACK) != 0);
             mMenuWakeScreen = (Settings.System.getIntForUser(resolver,
-                    Settings.System.MENU_WAKE_SCREEN, 0, UserHandle.USER_CURRENT) == 1);
+                    Settings.System.MENU_WAKE_SCREEN, 0, UserHandle.USER_CURRENT) == 1) &&
+                    ((mDeviceHardwareWakeKeys & KEY_MASK_MENU) != 0);
             mVolumeWakeScreen = (Settings.System.getIntForUser(resolver,
-                    Settings.System.VOLUME_WAKE_SCREEN, 0, UserHandle.USER_CURRENT) == 1);
+                    Settings.System.VOLUME_WAKE_SCREEN, 0, UserHandle.USER_CURRENT) == 1) &&
+                    ((mDeviceHardwareWakeKeys & KEY_MASK_VOLUME) != 0);
 
             // Configure wake gesture.
             boolean wakeGestureEnabledSetting = Settings.Secure.getIntForUser(resolver,
@@ -5328,7 +5320,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             }
 
             case KeyEvent.KEYCODE_HOME:
-                if (down && !interactive && mHomeWakeScreen && useHomeWake) {
+                if (down && !interactive && mHomeWakeScreen) {
                     isWakeKey = true;
                 }
                 break;
@@ -5518,8 +5510,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             case KeyEvent.KEYCODE_VOLUME_UP:
             case KeyEvent.KEYCODE_VOLUME_DOWN:
             case KeyEvent.KEYCODE_VOLUME_MUTE:
-                return (mVolumeWakeScreen && useVolumeWake) ||
-                         mDockMode != Intent.EXTRA_DOCK_STATE_UNDOCKED;
+                return mVolumeWakeScreen || mDockMode != Intent.EXTRA_DOCK_STATE_UNDOCKED;
 
             // ignore media and camera keys
             case KeyEvent.KEYCODE_MUTE:
@@ -5539,9 +5530,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 return false;
 
             case KeyEvent.KEYCODE_BACK:
-                return (mBackWakeScreen && useBackWake);
+                return mBackWakeScreen;
             case KeyEvent.KEYCODE_MENU:
-                return (mMenuWakeScreen && useMenuWake);
+                return mMenuWakeScreen;
         }
         return true;
     }
