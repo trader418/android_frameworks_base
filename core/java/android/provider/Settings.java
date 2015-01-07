@@ -3449,6 +3449,12 @@ public final class Settings {
          */
         public static final String RECENTS_CLEAR_ALL_LOCATION = "recents_clear_all_location";
 
+         /**
+         * Whether to dismiss all recents tasks
+         * @hide
+         */
+        public static final String RECENTS_CLEAR_ALL_DISMISS_ALL = "recents_clear_all_dismiss_all";
+
         /**
          * Boolean value on whether to show weather in the statusbar
          * @hide
