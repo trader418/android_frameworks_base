@@ -31,6 +31,7 @@
     <string name="profile_none">Nic</string>
     <string name="profile_picker_title">Profily</string>
     <string name="global_action_choose_profile">Profil</string>
+    <string name="global_action_screenshot">Snímek obrazovky</string>
     <string name="permgrouplab_security">Zabezpečení</string>
     <string name="permgroupdesc_security">Oprávnění vztahující se k informacím o zabezpečení zařízení.</string>
     <string name="permlab_readPhoneBlacklist">čtení černé listiny telefonu</string>
