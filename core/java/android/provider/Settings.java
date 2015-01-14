@@ -3767,6 +3767,14 @@ public final class Settings {
         public static final String RECENTS_USE_OMNISWITCH = "recents_use_omniswitch";
 
         /**
+         * Allows to disable Camera widget in locskcreen
+         * 0 = use system default (show)
+         * 1 = hide camera
+         * @hide
+         */
+        public static final String CAMERA_WIDGET_HIDE = "camera_widget_hide";
+
+        /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
          *
