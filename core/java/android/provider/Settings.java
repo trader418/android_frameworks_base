@@ -3857,6 +3857,14 @@ public final class Settings {
          */
         public static final String RECENTS_USE_OMNISWITCH = "recents_use_omniswitch";
 
+       /**
+         * Allows to disable weather in locskcreen
+         * 1 = use system default (show)
+         * 0 = hide Weather
+         * @hide
+         */
+        public static final String LOCKSCREEN_WEATHER = "lockscreen_weather";
+
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
