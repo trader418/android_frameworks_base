@@ -2244,12 +2244,6 @@ public final class Settings {
          */
         public static final String HEADS_UP_SNOOZE_TIME = "heads_up_snooze_time";
 
- 	/**
-        * Custom Screen Timeout
-        * @hide
-        */
-        public static final String QS_EXPANDED_SCREENTIMEOUT_MODE = "qs_expanded_screentimeout_mode";
-
         /**
          * Defines the global heads up notification decay
          *
