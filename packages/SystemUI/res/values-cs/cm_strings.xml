@@ -23,7 +23,6 @@
     <string name="advanced_dev_option_wipe_app">Vymazat data aplikací</string>
     <string name="advanced_dev_option_force_stop">Vynutit ukončení</string>
     <string name="advanced_dev_option_uninstall">Odinstalovat</string>
-    <string name="status_bar_expanded_header_weather_format"><xliff:g id="temp">%1$s</xliff:g> - <xliff:g id="condition">%2$s</xliff:g></string>
     <string name="accessibility_quick_settings_data_off">Mobilní data vypnuta</string>
     <string name="accessibility_quick_settings_data_on">Mobilní data zapnuta</string>
     <string name="accessibility_quick_settings_roaming_off">Roaming vypnut</string>
