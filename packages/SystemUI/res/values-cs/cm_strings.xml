@@ -37,17 +37,19 @@
     <string name="quick_settings_apn_switch_label">APN přepínač</string>
     <string name="quick_settings_dds_sub">Karta <xliff:g id="number">%d</xliff:g> data</string>
     <string name="quick_settings_data_off">Mobilní data vypnuta</string>
+    <string name="quick_settings_location_detail_title">Poloha</string>
     <string name="quick_settings_location_battery_saving_label">Úspora baterie</string>
     <string name="quick_settings_location_gps_only_label">Pouze zařízení</string>
     <string name="quick_settings_location_high_accuracy_label">Vysoká přesnost</string>
-    <string name="quick_settings_location_detail_title">Poloha</string>
-    <string name="quick_settings_location_detail_menu_title">Vybrat režim:</string>
-    <string name="quick_settings_location_detail_mode_high_accuracy_title">Vysoká přesnost</string>
-    <string name="quick_settings_location_detail_mode_battery_saving_title">Úspora baterie</string>
-    <string name="quick_settings_location_detail_mode_sensors_only_title">Pouze zařízení</string>
-    <string name="quick_settings_location_detail_mode_high_accuracy_description">Použít GPS, Wi\u2011Fi a mobilní sítě pro určování polohy</string>
-    <string name="quick_settings_location_detail_mode_battery_saving_description">Použít Wi\u2011Fi a mobilní sítě pro určování polohy</string>
-    <string name="quick_settings_location_detail_mode_sensors_only_description">Použít GPS pro určování polohy</string>
+    <string name="quick_settings_nfc_label">NFC</string>
+    <string name="quick_settings_profiles_detail_title">Systémové profily</string>
+    <string name="quick_settings_profiles_disabled">Profily vypnuty</string>
+    <string name="quick_settings_compass_label">Kompas</string>
+    <string name="quick_settings_compass_init">Inicializace\u2026</string>
+    <string name="quick_settings_lockscreen_label">Zamknout obrazovku</string>
+    <string name="quick_settings_network_adb_label">ADB po síti</string>
+    <string name="quick_settings_lte_label">LTE</string>
+    <string name="quick_settings_screen_timeout_detail_title">Prodleva vypnutí obrazovky</string>
     <string name="tasklistview_title">Správce úloh</string>
     <string name="message_switch_fail">Není možné přepnout na tuto úlohu, protože nemá žádné rozhraní.</string>
     <string name="tasklist_killall">Ukončit vše</string>
@@ -58,4 +60,19 @@
     <string name="wifi_restored">Spojení obnoveno</string>
     <string name="wifi_address_changed">Wi\u2011Fi SSID změneno na <xliff:g id="name">%s</xliff:g></string>
     <string name="wifi_changed_ticker">Wi\u2011Fi SSID: <xliff:g id="name">%s</xliff:g></string>
+    <string name="quick_settings_network_adb_enabled_label">Zapnuto</string>
+    <string name="quick_settings_network_adb_disabled_label">Vypnuto</string>
+    <string name="status_bar_expanded_header_weather_format"><xliff:g id="temp">%1$s</xliff:g> - <xliff:g id="condition">%2$s</xliff:g></string>
+    <string name="left_shortcut_hint">Posunutí vpravo vyvolá %1$s</string>
+    <string name="right_shortcut_hint">Posunutí vlevo vyvolá %1$s</string>
+    <!-- Dialog title for navigation bar button selection -->
+    <string name="navbar_dialog_title">Vybrat akci k přiřazení</string>
+    <string name="navbar_home_button">Tlačítko domů</string>
+    <string name="navbar_recent_button">Tlačítko přepínání aplikací</string>
+    <string name="navbar_search_button">Tlačítko hledání</string>
+    <string name="navbar_back_button">Tlačítko zpět</string>
+    <string name="navbar_empty_button">Prázdné tlačítko</string>
+    <string name="navbar_menu_conditional_button">Tlačítko menu (automaticky skryté)</string>
+    <string name="navbar_menu_always_button">Tlačítko menu (vždy zobrazené)</string>
+    <string name="navbar_menu_big_button">Tlačítko menu</string>
 </resources>
