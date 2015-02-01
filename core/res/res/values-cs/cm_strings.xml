@@ -63,6 +63,7 @@
     <string name="adb_net_active_notification_title">ADB po síti povoleno</string>
     <string name="adb_both_active_notification_title">ADB přes USB a po síti povoleno</string>
     <string name="adb_active_generic_notification_message">Dotykem zakázat ladění.</string>
+    <string name="usb_choose_notification_title">Dotykem zvolit možnosti USB.</string>
     <!-- App ops requests -->
     <string name="app_ops_access_camera">používat fotoaparát</string>
     <string name="app_ops_access_location">zjišťovat polohu</string>
@@ -136,4 +137,10 @@
     <string name="perf_profile_bal">Vyvážený</string>
     <string name="perf_profile_perf">Výkon</string>
     <string name="advanced_settings_title">Pokročilé</string>
+    <string name="theme_install_error_title">Chyba při instalaci témata vzhledu</string>
+    <string name="theme_install_error_message">Selhala instalace témata vzhledu %s</string>
+    <string name="theme_reset_notification_title">Téma vzhledu resetováno</string>
+    <string name="theme_reset_notification_body">Systémové téma bylo obnoveno kvůli opakovaným pádům aplikace.</string>
+    <string name="permlab_interceptSmsSent">kontrolovat odchozí SMS</string>
+    <string name="permdesc_interceptSmsSent">Umožnit aplikaci kontrolovat odchozí SMS zprávy. Allows the app to intercept an outgoing SMS. Škodlivým aplikacím tato vobla zabrání odesílání nechtěných SMS zpráv.</string>
 </resources>
