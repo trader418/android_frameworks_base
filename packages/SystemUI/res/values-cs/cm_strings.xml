@@ -49,6 +49,9 @@
     <string name="quick_settings_network_adb_label">ADB po síti</string>
     <string name="quick_settings_lte_label">LTE</string>
     <string name="quick_settings_screen_timeout_detail_title">Prodleva vypnutí obrazovky</string>
+    <string name="quick_settings_screenshot">Snímek obrazovky</string>
+    <string name="quick_settings_sync">Synchronizace</string>
+    <string name="quick_settings_sync_off">Synchronizace vypnuta</string>
     <string name="tasklistview_title">Správce úloh</string>
     <string name="message_switch_fail">Není možné přepnout na tuto úlohu, protože nemá žádné rozhraní.</string>
     <string name="tasklist_killall">Ukončit vše</string>

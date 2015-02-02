@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2012-2015 The CyanogenMod Project
+     Copyright (c) 2013, The Linux Foundation. All rights reserved.
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+          http://www.apache.org/licenses/LICENSE-2.0
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="keyguard_perso_locked_message">SIM/RUIM je perso zablokována</string>
+    <string name="keyguard_accessibility_status">Stav</string>
+    <string name="kg_dismiss">Zrušit</string>
+    <string name="kg_slot_name">Slot <xliff:g id="number">%d</xliff:g>: Nová SIM karta\u0020</string>
+    <string name="lockscreen_sim_error_message_short">Karta invalidní.</string>
+    <plurals name="kg_password_default_pin_message">
+        <item quantity="one">Vložit PIN SIMkarty, ještě zbývá <xliff:g id="number">%d</xliff:g> pokus před zablokováním karty. Potom bude třeba kontaktovat operátora.</item>
+        <item quantity="few">Vložit PIN SIMkarty, ještě zbývají <xliff:g id="number">%d</xliff:g> pokusy před zablokováním karty. Potom bude třeba kontaktovat operátora.</item>
+        <item quantity="other">Vložit PIN SIMkarty, ještě zbývá <xliff:g id="number">%d</xliff:g> pokusů před zablokováním karty. Potom bude třeba kontaktovat operátora.</item>
+    </plurals>
+    <plurals name="kg_password_default_puk_message">
+        <item quantity="one">SIM karta je zamčena. Pro pokračování je třeba zadat PUK kód. Ještě zbývá <xliff:g id="number">%d</xliff:g> pokus, než se karta permanentně zablokuje. Je třeba kontaktovat operátora.</item>
+        <item quantity="few">SIM karta je zamčena. Pro pokračování je třeba zadat PUK kód. Ještě zbývaji <xliff:g id="number">%d</xliff:g> pokusy, než se karta permanentně zablokuje. Je třeba kontaktovat operátora.</item>
+        <item quantity="other">SIM karta je zamčena. Pro pokračování je třeba zadat PUK kód. Ještě zbývá <xliff:g id="number">%d</xliff:g> pokusů, než se karta permanentně zablokuje. Je třeba kontaktovat operátora.</item>
+    </plurals>
+</resources>
