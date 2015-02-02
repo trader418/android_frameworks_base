@@ -130,7 +130,7 @@ public class KeyguardStatusView extends GridLayout implements
         mClockView = (TextClock) findViewById(R.id.clock_view);
         mOwnerInfo = (TextView) findViewById(R.id.owner_info);
         if (Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.LOCKSCREEN_WEATHER, 1, UserHandle.USER_CURRENT) == 1) {
+                Settings.System.LOCKSCREEN_WEATHER, 0, UserHandle.USER_CURRENT) == 1) {
             mWeatherIcon = (ImageView) findViewById(R.id.weather_image);
             mWeatherCity = (TextView) findViewById(R.id.city);
             mTemperatureText = (TextView) findViewById(R.id.temperature);
@@ -210,7 +210,7 @@ public class KeyguardStatusView extends GridLayout implements
         super.onAttachedToWindow();
         KeyguardUpdateMonitor.getInstance(mContext).registerCallback(mInfoCallback);
         if (Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.LOCKSCREEN_WEATHER, 1, UserHandle.USER_CURRENT) == 1) {
+                Settings.System.LOCKSCREEN_WEATHER, 0, UserHandle.USER_CURRENT) == 1) {
             mWeatherController.addCallback(this);
         }
     }
@@ -220,7 +220,7 @@ public class KeyguardStatusView extends GridLayout implements
         super.onDetachedFromWindow();
         KeyguardUpdateMonitor.getInstance(mContext).removeCallback(mInfoCallback);
         if (Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.LOCKSCREEN_WEATHER, 1, UserHandle.USER_CURRENT) == 1) {
+                Settings.System.LOCKSCREEN_WEATHER, 0, UserHandle.USER_CURRENT) == 1) {
             mWeatherController.removeCallback(this);
         }
     }
