@@ -2240,13 +2240,6 @@ public final class Settings {
         public static final String QS_SMART_PULLDOWN = "qs_smart_pulldown";
 
         /**
-         * Whether to enable ticker animation in statusbar
-         *
-         * @hide
-         */
-        public static final String STATUS_BAR_TICKER_ENABLED = "status_bar_ticker_enabled";
-
-        /**
          * Deprecated Use {@link android.provider.Settings.Secure.QS_TILES}
          * @hide
          */
