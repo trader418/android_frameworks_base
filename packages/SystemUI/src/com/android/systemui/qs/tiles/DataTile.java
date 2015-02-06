@@ -73,7 +73,6 @@ public class DataTile extends QSTile<QSTile.BooleanState> {
                     "com.android.settings.Settings$DataUsageSummaryActivity"));
             mHost.startSettingsActivity(intent);
         }
-        qsCollapsePanel();
     }
 
     @Override
