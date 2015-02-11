@@ -64,7 +64,7 @@
   <string name="reboot_recovery">Recuperação</string>
   <string name="reboot_bootloader">Bootloader</string>
   <string name="reboot_download">Download</string>
-  <string name="reboot_soft">Reiniciar via software</string>
+  <string name="reboot_soft">Reiniciar suave</string>
   <string name="reboot_title">Reiniciar</string>
   <string name="reboot_confirm" product="tablet">Seu tablet irá reiniciar.</string>
   <string name="reboot_confirm" product="default">Seu telefone irá reiniciar.</string>
