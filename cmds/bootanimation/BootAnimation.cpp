@@ -728,6 +728,9 @@ bool BootAnimation::movie()
     if (strncmp(value, "1", 1) != 0) {
         playBackgroundMusic();
     }
+
+    bool repeat = false;
+
     for (size_t i=0 ; i<pcount ; i++) {
         const Animation::Part& part(animation.parts[i]);
         const size_t fcount = part.frames.size();
@@ -753,6 +756,7 @@ bool BootAnimation::movie()
         }
 
         for (int r=0 ; !part.count || r<part.count ; r++) {
+            repeat = false;
             // Exit any non playuntil complete parts immediately
             if(exitPending() && !part.playUntilComplete)
                 break;
@@ -775,12 +779,6 @@ bool BootAnimation::movie()
                 if (r > 0 && !needSaveMem) {
                     glBindTexture(GL_TEXTURE_2D, frame.tid);
                 } else {
-                    if (!needSaveMem && part.count != 1) {
-                        glGenTextures(1, &frame.tid);
-                        glBindTexture(GL_TEXTURE_2D, frame.tid);
-                        glTexParameterx(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                        glTexParameterx(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                    }
                     initTexture(
                             frame.map->getDataPtr(),
                             frame.map->getDataLength());
@@ -824,13 +822,10 @@ bool BootAnimation::movie()
             // For infinite parts, we've now played them at least once, so perhaps exit
             if(exitPending() && !part.count)
                 break;
-        }
 
-        // free the textures for this part
-        if (!needSaveMem && part.count != 1) {
-            for (size_t j=0 ; j<fcount ; j++) {
-                const Animation::Frame& frame(part.frames[j]);
-                glDeleteTextures(1, &frame.tid);
+            repeat = true;
+            if (!part.count) {
+                break;
             }
         }
 
@@ -838,6 +833,9 @@ bool BootAnimation::movie()
             glDeleteTextures(1, &mTextureid);
         }
 
+        if (repeat && !part.count) {
+            i--;
+        }
     }
 
     if (isMPlayerPrepared) {
