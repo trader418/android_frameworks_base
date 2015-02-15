@@ -406,6 +406,7 @@ status_t BootAnimation::readyToRun() {
         mZip = zipFile;
     }
 
+
 #ifdef PRELOAD_BOOTANIMATION
     // Preload the bootanimation zip on memory, so we don't stutter
     // when showing the animation
@@ -727,18 +728,12 @@ bool BootAnimation::movie()
     if (strncmp(value, "1", 1) != 0) {
         playBackgroundMusic();
     }
+
+    bool repeat = false;
+
     for (size_t i=0 ; i<pcount ; i++) {
         const Animation::Part& part(animation.parts[i]);
         const size_t fcount = part.frames.size();
-
-        // can be 1, 0, or not set
-        #ifdef NO_TEXTURE_CACHE
-        const int noTextureCache = NO_TEXTURE_CACHE;
-        #else
-        const int noTextureCache =
-                ((animation.width * animation.height * fcount) > 48 * 1024 * 1024) ? 1 : 0;
-        #endif
-
         glBindTexture(GL_TEXTURE_2D, 0);
 
         /*calculate if we need to runtime save memory
@@ -750,7 +745,7 @@ bool BootAnimation::movie()
         GLuint mTextureid;
         glGetIntegerv(GL_MAX_TEXTURE_SIZE, &mMaxTextureSize);
         //ALOGD("freemem:%ld, %d", getFreeMemory(), mMaxTextureSize);
-        if(getFreeMemory() < mMaxTextureSize * mMaxTextureSize * fcount / 1024 || noTextureCache) {
+        if(getFreeMemory() < mMaxTextureSize * mMaxTextureSize * fcount / 1024) {
             ALOGD("Use save memory method, maybe small fps in actual.");
             needSaveMem = true;
             glGenTextures(1, &mTextureid);
@@ -761,6 +756,7 @@ bool BootAnimation::movie()
         }
 
         for (int r=0 ; !part.count || r<part.count ; r++) {
+            repeat = false;
             // Exit any non playuntil complete parts immediately
             if(exitPending() && !part.playUntilComplete)
                 break;
@@ -783,12 +779,6 @@ bool BootAnimation::movie()
                 if (r > 0 && !needSaveMem) {
                     glBindTexture(GL_TEXTURE_2D, frame.tid);
                 } else {
-                    if (!needSaveMem && part.count != 1) {
-                        glGenTextures(1, &frame.tid);
-                        glBindTexture(GL_TEXTURE_2D, frame.tid);
-                        glTexParameterx(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                        glTexParameterx(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                    }
                     initTexture(
                             frame.map->getDataPtr(),
                             frame.map->getDataLength());
@@ -832,13 +822,10 @@ bool BootAnimation::movie()
             // For infinite parts, we've now played them at least once, so perhaps exit
             if(exitPending() && !part.count)
                 break;
-        }
 
-        // free the textures for this part
-        if (!needSaveMem && part.count != 1) {
-            for (size_t j=0 ; j<fcount ; j++) {
-                const Animation::Frame& frame(part.frames[j]);
-                glDeleteTextures(1, &frame.tid);
+            repeat = true;
+            if (!part.count) {
+                break;
             }
         }
 
@@ -846,6 +833,9 @@ bool BootAnimation::movie()
             glDeleteTextures(1, &mTextureid);
         }
 
+        if (repeat && !part.count) {
+            i--;
+        }
     }
 
     if (isMPlayerPrepared) {
