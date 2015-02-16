@@ -3580,6 +3580,12 @@ public final class Settings {
                 "mute_annoying_notifications_threshold";
 
         /**
+         * Timeout for volume panel
+         * @hide
+         */
+        public static final String VOLUME_PANEL_TIMEOUT = "volume_panel_timeout";
+
+        /**
          * Whether to prevent loud volume levels when headset is first plugged in.
          * @hide
          */
