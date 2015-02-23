@@ -2230,9 +2230,18 @@ public final class Settings {
 
         /**
          * Whether to allow one finger quick settings expansion on the right side of the statusbar.
+         * @deprecated Use {@link android.provider.Settings.System#QS_QUICK_PULLDOWN} instead
          * @hide
          */
-        public static final String STATUS_BAR_QUICK_QS_PULLDOWN = "status_bar_quick_qs_pulldown";
+        @Deprecated
+        public static final String STATUS_BAR_QUICK_QS_PULLDOWN = System.QS_QUICK_PULLDOWN;
+
+        /**
+         * Quick Settings Quick Pulldown
+         * 0 = off, 1 = right, 2 = left
+         * @hide
+         */
+        public static final String QS_QUICK_PULLDOWN = "qs_quick_pulldown";
 
         /**
          * Whether to show the brightness slider in quick settings panel.
@@ -3681,13 +3690,13 @@ public final class Settings {
         public static final String VOLUME_MUSIC_CONTROLS = "volume_music_controls";
 
         /**
-         *  Enable statusbar double tap gesture on to put device to sleep
+         * Enable statusbar double tap gesture on to put device to sleep
          * @hide
          */
         public static final String DOUBLE_TAP_SLEEP_GESTURE = "double_tap_sleep_gesture";
 
         /**
-         *  Enable navigation bar double tap gesture on to put device to sleep
+         * Enable navigation bar double tap gesture on to put device to sleep
          * @hide
          */
         public static final String DOUBLE_TAP_SLEEP_NAVBAR = "double_tap_sleep_navbar";
