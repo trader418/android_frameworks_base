@@ -97,7 +97,6 @@ public class ApnTile extends QSTile<QSTile.State> {
         }
         if (DEBUG) Log.i(TAG, "Current apn id is: " + curId);
         setPrefApn(curId);
-        qsCollapsePanel();
     }
 
     @Override
