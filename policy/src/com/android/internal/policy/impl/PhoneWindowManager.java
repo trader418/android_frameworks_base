@@ -3028,25 +3028,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                         return -1;
                     }
                 } else if (longPress) {
-                    if (!keyguardOn) {
+                    if (!keyguardOn && mLongPressOnMenuBehavior != KEY_ACTION_NOTHING) {
                         if (mLongPressOnMenuBehavior != KEY_ACTION_APP_SWITCH) {
                             cancelPreloadRecentApps();
                         }
-                        if (!hasNavigationBar()) {
-                            try {
-                                if (ActivityManagerNative.getDefault().isInLockTaskMode())
-                                    ActivityManagerNative.getDefault().stopLockTaskModeOnCurrent();
-                            } catch (RemoteException e) {
-                                if (mLongPressOnMenuBehavior != KEY_ACTION_NOTHING) {
-                                    performHapticFeedbackLw(null, HapticFeedbackConstants.LONG_PRESS, false);
-                                    performKeyAction(mLongPressOnMenuBehavior);
-                                }
-                            }
-                        }
-                        if (mLongPressOnMenuBehavior != KEY_ACTION_NOTHING) {
-                            performHapticFeedbackLw(null, HapticFeedbackConstants.LONG_PRESS, false);
-                            performKeyAction(mLongPressOnMenuBehavior);
-                        }
+                        performHapticFeedbackLw(null, HapticFeedbackConstants.LONG_PRESS, false);
+                        performKeyAction(mLongPressOnMenuBehavior);
                         mMenuPressed = false;
                         return -1;
                     }
