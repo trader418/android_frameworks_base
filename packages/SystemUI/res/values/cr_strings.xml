@@ -26,4 +26,7 @@
     <!-- Power menu on navring targets -->
     <string name="navring_action_power_menu">Power Menu</string>
 
+    <!-- Greeting -->
+    <string name="temasek_label">Welcome to temasek</string>
+
 </resources>
