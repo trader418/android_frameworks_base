@@ -1622,7 +1622,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     }
 
     private void removeHeadsUpView() {
-        mWindowManager.removeView(mHeadsUpNotificationView);
+        if (mHeadsUpNotificationView != null && mHeadsUpNotificationView.isAttachedToWindow()) {
+            mWindowManager.removeView(mHeadsUpNotificationView);
+        }
     }
 
     public void refreshAllStatusBarIcons() {
@@ -3488,7 +3490,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         }
     }
 
-    Animation.AnimationListener mTickingDoneListener = new Animation.AnimationListener() {;
+    Animation.AnimationListener mTickingDoneListener = new Animation.AnimationListener() {
         public void onAnimationEnd(Animation animation) {
             mTicking = false;
         }
