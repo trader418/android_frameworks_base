@@ -730,14 +730,14 @@ public final class PendingIntent implements Parcelable {
             String resolvedType = intent != null ?
                     intent.resolveTypeIfNeeded(context.getContentResolver())
                     : null;
-            int res = mTarget.send(code, intent, resolvedType,
-                    onFinished != null
-                            ? new FinishedDispatcher(this, onFinished, handler)
-                            : null,
-                    requiredPermission);
-            if (res < 0) {
-                throw new CanceledException();
-            }
+			int res = mTarget.send(code, intent, resolvedType,
+					onFinished != null
+					? new FinishedDispatcher(this, onFinished, handler)
+					: null,
+					requiredPermission);
+			if (res < 0) {
+				throw new CanceledException();
+			}
         } catch (RemoteException e) {
             throw new CanceledException(e);
         }
