@@ -23,13 +23,6 @@
     <color name="pie_long_pressed_color">#ff8c8c8c</color>
     <color name="pie_outline_color">#ff5c5c5c</color>
 
-    <!-- app sidebar trigger region color -->
-    <color name="trigger_region_color">#8015a0e5</color>
-    <!-- app sidebar item text color -->
-    <color name="sidebar_item_text_color">#ffffffff</color>
-    <!-- app sidebar item text shadow color -->
-    <color name="sidebar_item_text_shadow_color">#ff000000</color>
-
     <!-- Task Manager -->
     <color name="memory_usage_item_background">#00000000</color>
     <color name="task_manager_title_text">#ffffffff</color>
