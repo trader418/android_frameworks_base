@@ -117,16 +117,6 @@ public class BatteryStatsImpl extends BatteryStats {
     static final int MSG_REPORT_POWER_CHANGE = 2;
     static final long DELAY_UPDATE_WAKELOCKS = 5*1000;
 
-   // MUTT
-   // How aggressively should we control rate
-   double scale_delay;
-   static final double MIN_SCALE_DELAY = 1.01;
-   static final double MAX_SCALE_DELAY = 2;
-   static final long MIN_DELAY = 5*60*1000;        // 5 minutes
-   static final long MAX_DELAY = 24*60*60*1000;    // 1 minute
-   static final String MUTT_TAG = "MUTT";
-
-
     public interface BatteryCallback {
         public void batteryNeedsCpuUpdate();
         public void batteryPowerChanged(boolean onBattery);
@@ -3053,7 +3043,6 @@ public class BatteryStatsImpl extends BatteryStats {
                 if (DEBUG_HISTORY) Slog.v(TAG, "Screen on to: "
                         + Integer.toHexString(mHistoryCur.states));
                 addHistoryRecordLocked(elapsedRealtime, uptime);
-                Slog.v(MUTT_TAG, "Screen on ");
                 mScreenOnTimer.startRunningLocked(elapsedRealtime);
                 if (mScreenBrightnessBin >= 0) {
                     mScreenBrightnessTimer[mScreenBrightnessBin].startRunningLocked(elapsedRealtime);
@@ -3460,46 +3449,6 @@ public class BatteryStatsImpl extends BatteryStats {
             mWifiOnTimer.stopRunningLocked(elapsedRealtime);
         }
     }
-
-    // MUTT
-   public void noteFgLocked(int uid, String name) {
-       Slog.v(MUTT_TAG, "noteFgLocked " + name);
-        getPackageStatsLocked(uid, name).updateFgTime();
-   }
-   public long allowMutt(int uid, String name) {
-       if(uid <= Process.FIRST_APPLICATION_UID)
-           return 0;
-       long ret = getPackageStatsLocked(uid, name).allowMutt(true);
-       Slog.v(MUTT_TAG, "allowMutt " + uid + " " + name + " " + ret);
-        return ret;
-   }
-   public long nextMutt(int uid, String name) {
-       if(uid <= Process.FIRST_APPLICATION_UID)
-           return 0;
-       long ret = getPackageStatsLocked(uid, name).allowMutt(false);
-       Slog.v(MUTT_TAG, "nextMutt " + uid + " " + name + " " + ret);
-        return ret;
-
-   }
-
-   public void setScale(int scale) {
-       // scale is between 0 and 1
-       scale_delay=MIN_SCALE_DELAY+((MAX_SCALE_DELAY-MIN_SCALE_DELAY)*scale)/100;
-       Slog.v(MUTT_TAG, "setScale " + scale_delay);
-   }
-   public boolean getMuttForPackage(int uid, String name) {
-       if(uid <= Process.FIRST_APPLICATION_UID)
-           return false;
-       boolean ret = getPackageStatsLocked(uid, name).getMutt();
-       Slog.v(MUTT_TAG, "getMutt " + uid + " " + name + " " + ret);
-        return ret;
-   }
-   public void setMuttForPackage(int uid, String name, boolean enabled) {
-       if(uid <= Process.FIRST_APPLICATION_UID)
-           return;
-       Slog.v(MUTT_TAG, "setMutt " + uid + " " + name);
-       getPackageStatsLocked(uid, name).setMutt(enabled);
-   }
 
     public void noteAudioOnLocked(int uid) {
         uid = mapUid(uid);
@@ -5879,20 +5828,9 @@ public class BatteryStatsImpl extends BatteryStats {
              * The statics we have collected for this package's services.
              */
             final HashMap<String, Serv> mServiceStats = new HashMap<String, Serv>();
-            
-            // MUTT
-           long mLastFgTime;
-           long mLastBgTime;
-           long mThreshTime;
-           boolean mMuttEnabled;
-           int mAllowed;
-           int mDenied;
 
             Pkg() {
                 mOnBatteryScreenOffTimeBase.add(this);
-                // MUTT
-                mThreshTime = MIN_DELAY;
-                mMuttEnabled = true;
             }
 
             public void onTimeStarted(long elapsedRealtime, long baseUptime, long baseRealtime) {
@@ -5911,11 +5849,6 @@ public class BatteryStatsImpl extends BatteryStats {
                 mLoadedWakeups = in.readInt();
                 mLastWakeups = 0;
                 mUnpluggedWakeups = in.readInt();
-                // MUTT
-                mLastFgTime = in.readLong();
-                mLastBgTime = in.readLong();
-                mThreshTime = in.readLong();
-                mMuttEnabled = (in.readByte() != 0);
 
                 int numServs = in.readInt();
                 mServiceStats.clear();
@@ -5932,11 +5865,6 @@ public class BatteryStatsImpl extends BatteryStats {
                 out.writeInt(mWakeups);
                 out.writeInt(mLoadedWakeups);
                 out.writeInt(mUnpluggedWakeups);
-                // MUTT
-                out.writeLong(mLastFgTime);
-                out.writeLong(mLastBgTime);
-                out.writeLong(mThreshTime);
-                out.writeByte((byte) (mMuttEnabled ? 1:0));
 
                 out.writeInt(mServiceStats.size());
                 for (Map.Entry<String, Uid.Pkg.Serv> servEntry : mServiceStats.entrySet()) {
@@ -6095,9 +6023,6 @@ public class BatteryStatsImpl extends BatteryStats {
                     mUnpluggedStartTime = in.readLong();
                     mUnpluggedStarts = in.readInt();
                     mUnpluggedLaunches = in.readInt();
-                    // MUTT
-                    mAllowed = in.readInt();
-                    mDenied = in.readInt();
                 }
 
                 void writeToParcelLocked(Parcel out) {
@@ -6115,9 +6040,6 @@ public class BatteryStatsImpl extends BatteryStats {
                     out.writeLong(mUnpluggedStartTime);
                     out.writeInt(mUnpluggedStarts);
                     out.writeInt(mUnpluggedLaunches);
-                    // MUTT
-                    out.writeInt(mAllowed);
-                    out.writeInt(mDenied);
                 }
 
                 long getLaunchTimeToNowLocked(long batteryUptime) {
@@ -6155,8 +6077,6 @@ public class BatteryStatsImpl extends BatteryStats {
                         mStarts++;
                         mRunningSince = getBatteryUptimeLocked();
                         mRunning = true;
-                        // MUTT
-                        Pkg.this.updateBgTime();
                     }
                 }
 
@@ -6222,64 +6142,6 @@ public class BatteryStatsImpl extends BatteryStats {
             final Serv newServiceStatsLocked() {
                 return new Serv();
             }
-
-            // MUTT
-
-           public void updateFgTime () {
-               mLastFgTime = SystemClock.elapsedRealtime();
-               mThreshTime = MIN_DELAY;
-               Slog.v(MUTT_TAG, "updateFgTime " + mLastBgTime);
-           }
-           public void updateBgTime () {
-               mLastBgTime = SystemClock.elapsedRealtime();
-               Slog.v(MUTT_TAG, "updateBgTime " + mLastBgTime);
-           }
-           public long allowMutt (boolean shouldUpdateBg) {
-               if(mScreenState==1) {
-                   Slog.v(MUTT_TAG, "allowMutt mScreenOn");
-                   if(shouldUpdateBg) {
-                       updateBgTime();
-                   }
-                   return 0;
-               }
-               if(!mMuttEnabled){
-                   Slog.v(MUTT_TAG, "allowMutt mMuttDisabled");
-                   if(shouldUpdateBg) {
-                       updateBgTime();
-                   }
-                   mAllowed ++;
-                   return 0;
-               }
-               long currentTime = SystemClock.elapsedRealtime();
-               Slog.v(MUTT_TAG, "allowMutt current " + currentTime);
-               long diffTime = mThreshTime - (currentTime-mLastBgTime);
-               if(diffTime <= 0) {
-                   if(shouldUpdateBg) {
-                       updateBgTime();
-                   }
-                   if(mThreshTime * scale_delay < MAX_DELAY) {
-                       mThreshTime = (long)(mThreshTime*scale_delay);
-                       Slog.v(MUTT_TAG, "allowMutt thresh " + mThreshTime);
-                   }
-                   mAllowed ++;
-                   return 0;
-               } else {
-                   mDenied ++;
-                   return diffTime;
-               }
-           }
-           public boolean getMutt() {
-               return mMuttEnabled;
-           }
-           public void setMutt(boolean enabled) {
-               mMuttEnabled = enabled;
-           }
-           public int getAllowed() {
-               return mAllowed;
-           }
-           public int getDenied() {
-               return mDenied;
-           }
         }
 
         /**
@@ -6601,8 +6463,6 @@ public class BatteryStatsImpl extends BatteryStats {
         mCurrentBatteryLevel = 0;
         initDischarge();
         clearHistoryLocked();
-        // MUTT-- default value of beta = 1.2
-        setScale(20);
     }
 
     public BatteryStatsImpl(Parcel p) {
@@ -6611,8 +6471,6 @@ public class BatteryStatsImpl extends BatteryStats {
         mHandler = null;
         clearHistoryLocked();
         readFromParcel(p);
-        // MUTT-- default value of beta = 1.2
-        setScale(20);
     }
 
     /** @hide */

@@ -1640,16 +1640,10 @@ final class ActivityStack {
                         != PackageManager.PERMISSION_GRANTED) {
                     mService.showLaunchWarningLocked(mLastStartedActivity, next);
                 } else {
-                    // MUTT
-                    mService.mBatteryStatsService.noteFg(next.app.uid, next.packageName);
-
                     next.startTime = now;
                     mLastStartedActivity = next;
                 }
             } else {
-                // MUTT
-                mService.mBatteryStatsService.noteFg(next.app.uid, next.packageName);
-
                 next.startTime = SystemClock.uptimeMillis();
                 mLastStartedActivity = next;
             }

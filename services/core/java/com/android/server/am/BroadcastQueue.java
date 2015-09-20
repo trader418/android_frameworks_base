@@ -44,11 +44,6 @@ import android.util.EventLog;
 import android.util.Log;
 import android.util.Slog;
 
-// MUTT
-import android.content.IntentFilter;
-import com.android.internal.telephony.TelephonyIntents;
-
-
 /**
  * BROADCASTS
  *
@@ -141,9 +136,6 @@ public final class BroadcastQueue {
      */
     int mPendingBroadcastRecvIndex;
 
-    // MUTT
-    IntentFilter mMuttFilter;
-
     static ArrayList<String> quickbootWhiteList = null;
     static final int BROADCAST_INTENT_MSG = ActivityManagerService.FIRST_BROADCAST_QUEUE_MSG;
     static final int BROADCAST_TIMEOUT_MSG = ActivityManagerService.FIRST_BROADCAST_QUEUE_MSG + 1;
@@ -194,18 +186,6 @@ public final class BroadcastQueue {
         mQueueName = name;
         mTimeoutPeriod = timeoutPeriod;
         mDelayBehindServices = allowDelayBehindServices;
-    
-        // MUTT
-        mMuttFilter = new IntentFilter();
-        // boot
-        mMuttFilter.addAction(Intent.ACTION_BOOT_COMPLETED);
-        mMuttFilter.addAction(Intent.ACTION_PRE_BOOT_COMPLETED);
-        // screen
-        mMuttFilter.addAction(Intent.ACTION_SCREEN_ON);
-        mMuttFilter.addAction(Intent.ACTION_SCREEN_OFF);
-        // other
-        mMuttFilter.addAction(Intent.ACTION_PROVIDER_CHANGED);
-        mMuttFilter.addAction(TelephonyIntents.ACTION_SIM_STATE_CHANGED);
     }
 
     public boolean isPendingBroadcastProcessLocked(int pid) {
@@ -503,24 +483,6 @@ public final class BroadcastQueue {
                 skip = true;
             }
         }
-        // MUTT
-	if(mMuttFilter.hasAction(r.intent.getAction())) {
-		Slog.v(TAG, "MUTT: whitelist broadcast "
-				+ r.intent.toString());
-	} else {
-		if (mService.mBatteryStatsService.allowMutt( filter.receiverList.uid,
-					filter.packageName) != 0) {
-			Slog.w(TAG, "MUTT: skipping broadcasting "
-					+ r.intent.toString()
-					+ " from " + r.callerPackage + " (pid="
-					+ r.callingPid + ", uid=" + r.callingUid 
-					+ " to " + filter
-					+ ")");
-                
-					skip = true;
-		}
-	}
-
         if (!skip) {
             skip = !mService.mIntentFirewall.checkBroadcast(r.intent, r.callingUid,
                     r.callingPid, r.resolvedType, filter.receiverList.uid);

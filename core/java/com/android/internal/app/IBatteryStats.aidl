@@ -116,6 +116,7 @@ interface IBatteryStats {
     long getAwakeTimeBattery();
     long getAwakeTimePlugged();
 
+
     /** @hide */
     byte[] getDockStatistics();
     /** @hide */
@@ -128,9 +129,4 @@ interface IBatteryStats {
     long getAwakeTimeDockBattery();
     /** @hide **/
     long getAwakeTimeDockPlugged();
-
-    // MUTT
-    long allowMutt(int uid, String pkg);
-    long allowMutt_();
-    long nextMutt(int uid, String pkg);
 }

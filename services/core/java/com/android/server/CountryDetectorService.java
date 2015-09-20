@@ -34,10 +34,6 @@ import android.os.RemoteException;
 import android.util.PrintWriterPrinter;
 import android.util.Printer;
 import android.util.Slog;
-// MUTT
-import android.os.ServiceManager;
-import com.android.internal.app.IBatteryStats;
-import android.os.Binder;
 
 /**
  * This class detects the country that the user is in through
@@ -54,17 +50,10 @@ public class CountryDetectorService extends ICountryDetector.Stub implements Run
     private final class Receiver implements IBinder.DeathRecipient {
         private final ICountryListener mListener;
         private final IBinder mKey;
-        // MUTT
-        public int mUid;
-        public String mPkg;
 
-        public Receiver(ICountryListener listener, int uid) {
+        public Receiver(ICountryListener listener) {
             mListener = listener;
             mKey = listener.asBinder();
-			// MUTT
-			mUid = uid;
-			mPkg = mContext.getPackageManager().getNameForUid(uid);
- 
         }
 
         public void binderDied() {
@@ -101,16 +90,10 @@ public class CountryDetectorService extends ICountryDetector.Stub implements Run
     private Handler mHandler;
     private CountryListener mLocationBasedDetectorListener;
 
-    // MUTT
-    private final IBatteryStats mBatteryStats;
-
     public CountryDetectorService(Context context) {
         super();
         mReceivers = new HashMap<IBinder, Receiver>();
         mContext = context;
-
-        // MUTT
-        mBatteryStats = IBatteryStats.Stub.asInterface(ServiceManager.getService("batteryinfo"));     
     }
 
     @Override
@@ -146,10 +129,8 @@ public class CountryDetectorService extends ICountryDetector.Stub implements Run
 
     private void addListener(ICountryListener listener) {
         synchronized (mReceivers) {
+            Receiver r = new Receiver(listener);
             try {
-                // MUTT
-                int uid = Binder.getCallingUid();
-                Receiver r = new Receiver(listener, uid);
                 listener.asBinder().linkToDeath(r, 0);
                 mReceivers.put(listener.asBinder(), r);
                 if (mReceivers.size() == 1) {
@@ -177,11 +158,7 @@ public class CountryDetectorService extends ICountryDetector.Stub implements Run
         synchronized(mReceivers) {
             for (Receiver receiver : mReceivers.values()) {
                 try {
-					if(mBatteryStats.allowMutt(receiver.mUid, receiver.mPkg) == 0) { 
-						receiver.getListener().onCountryDetected(country);
-					} else {
-						Slog.w(TAG, "MUTT notifyReceivers failed");
-					}
+                    receiver.getListener().onCountryDetected(country);
                 } catch (RemoteException e) {
                     // TODO: Shall we remove the receiver?
                     Slog.e(TAG, "notifyReceivers failed:", e);
