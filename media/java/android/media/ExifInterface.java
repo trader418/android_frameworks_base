@@ -123,12 +123,16 @@ public class ExifInterface {
     private String mFilename;
     private HashMap<String, String> mAttributes;
     private boolean mHasThumbnail;
-
     // Because the underlying implementation (jhead) uses static variables,
     // there can only be one user at a time for the native functions (and
     // they cannot keep state in the native code across function calls). We
     // use sLock to serialize the accesses.
     private static final Object sLock = new Object();
+    // The following values used for indicating a thumbnail position.
+    private int mThumbnailOffset;
+    private int mThumbnailLength;
+    private byte[] mThumbnailBytes;
+    private boolean mIsSupportedFile;
 
     // Pattern to check non zero timestamp
     private static final Pattern sNonZeroTimePattern = Pattern.compile(".*[1-9].*");
@@ -312,6 +316,125 @@ public class ExifInterface {
 
     /**
      * Returns the offset and length of thumbnail inside the JPEG file, or
+     * This function decides which parser to read the image data according to the given input stream
+     * type and the content of the input stream. In each case, it reads the first three bytes to
+     * determine whether the image data format is JPEG or not.
+     */
+    private void loadAttributes() throws IOException {
+        // Initialize mAttributes.
+        for (int i = 0; i < EXIF_TAGS.length; ++i) {
+            mAttributes[i] = new HashMap();
+        }
+        try {
+            InputStream in = new FileInputStream(mFilename);
+            getJpegAttributes(in);
+            mIsSupportedFile = true;
+        } catch (IOException e) {
+            // Ignore exceptions in order to keep the compatibility with the old versions of
+            // ExifInterface.
+            mIsSupportedFile = false;
+            Log.w(TAG, "Invalid image.", e);
+        } finally {
+            addDefaultValuesForCompatibility();
+            if (DEBUG) {
+                printAttributes();
+            }
+        }
+    }
+
+    // Prints out attributes for debugging.
+    private void printAttributes() {
+        for (int i = 0; i < mAttributes.length; ++i) {
+            Log.d(TAG, "The size of tag group[" + i + "]: " + mAttributes[i].size());
+            for (Map.Entry entry : (Set<Map.Entry>) mAttributes[i].entrySet()) {
+                final ExifAttribute tagValue = (ExifAttribute) entry.getValue();
+                Log.d(TAG, "tagName: " + entry.getKey() + ", tagType: " + tagValue.toString()
+                        + ", tagValue: '" + tagValue.getStringValue(mExifByteOrder) + "'");
+            }
+        }
+    }
+
+    /**
+     * Save the tag data into the original image file. This is expensive because it involves
+     * copying all the data from one file to another and deleting the old file and renaming the
+     * other. It's best to use {@link #setAttribute(String,String)} to set all attributes to write
+     * and make a single call rather than multiple calls for each attribute.
+     */
+    public void saveAttributes() throws IOException {
+        if (!mIsSupportedFile) {
+            throw new UnsupportedOperationException(
+                    "ExifInterface only supports saving attributes on JPEG formats.");
+        }
+        // Keep the thumbnail in memory
+        mThumbnailBytes = getThumbnail();
+
+        File tempFile = null;
+        // Move the original file to temporary file.
+        tempFile = new File(mFilename + ".tmp");
+        File originalFile = new File(mFilename);
+        if (!originalFile.renameTo(tempFile)) {
+            throw new IOException("Could'nt rename to " + tempFile.getAbsolutePath());
+        }
+
+        FileInputStream in = null;
+        FileOutputStream out = null;
+        try {
+            // Save the new file.
+            in = new FileInputStream(tempFile);
+            out = new FileOutputStream(mFilename);
+            saveJpegAttributes(in, out);
+        } finally {
+            IoUtils.closeQuietly(in);
+            IoUtils.closeQuietly(out);
+            tempFile.delete();
+        }
+
+        // Discard the thumbnail in memory
+        mThumbnailBytes = null;
+    }
+
+    /**
+     * Returns true if the image file has a thumbnail.
+     */
+    public boolean hasThumbnail() {
+        return mHasThumbnail;
+    }
+
+    /**
+     * Returns the thumbnail inside the image file, or {@code null} if there is no thumbnail.
+     * The returned data is in JPEG format and can be decoded using
+     * {@link android.graphics.BitmapFactory#decodeByteArray(byte[],int,int)}
+     */
+    public byte[] getThumbnail() {
+        if (!mHasThumbnail) {
+            return null;
+        }
+        if (mThumbnailBytes != null) {
+            return mThumbnailBytes;
+        }
+
+        // Read the thumbnail.
+        FileInputStream in = null;
+        try {
+            in = new FileInputStream(mFilename);
+            if (in.skip(mThumbnailOffset) != mThumbnailOffset) {
+                throw new IOException("Corrupted image");
+            }
+            byte[] buffer = new byte[mThumbnailLength];
+            if (in.read(buffer) != mThumbnailLength) {
+                throw new IOException("Corrupted image");
+            }
+            return buffer;
+        } catch (IOException e) {
+            // Couldn't get a thumbnail image.
+        } finally {
+            IoUtils.closeQuietly(in);
+        }
+        return null;
+    }
+
+    /**
+     * Returns the offset and length of thumbnail inside the image file, or
      * {@code null} if there is no thumbnail.
      *
      * @return two-element array, the offset in the first value, and length in
